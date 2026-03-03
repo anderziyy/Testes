@@ -627,25 +627,19 @@ mutLayout.CellSize = UDim2.new(0, 80, 0, 30)
 mutLayout.SortOrder = Enum.SortOrder.LayoutOrder
 mutLayout.Parent = IndexMutContainer
 
-local mutSelected = savedSettings["IndexMuts"] or {Normal = true, Gold = true, Diamond = true, Rainbow = true, Galaxy = true}
-savedSettings["IndexMuts"] = mutSelected
-
+local mutSelected = {Normal = true, Gold = true, Diamond = true, Rainbow = true, Galaxy = true}
 for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy"}) do
     local btn = Instance.new("TextButton")
-    btn.BackgroundColor3 = mutSelected[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
     btn.Text = m
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Parent = IndexMutContainer
     Instance.new("UICorner", btn)
-    
     btn.MouseButton1Click:Connect(function()
         mutSelected[m] = not mutSelected[m]
         btn.BackgroundColor3 = mutSelected[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
-        savedSettings["IndexMuts"] = mutSelected
-        saveSettings()
     end)
 end
-
 table.insert(options["Farm"], IndexMutContainer)
 
 local idxLabelBtn = IdxContainer:FindFirstChildOfClass("TextLabel")

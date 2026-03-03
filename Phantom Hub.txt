@@ -32,7 +32,7 @@ local sellBrainrots = {
     "Brr Brr Patapim", "Rhino Toasterino", "Brr Bicus Dicus", "Strawberrelli Flamingelli", "Bananito Delfinito", "Balerina Capucina", "Glorbo Fruttodrillo",
     "Blueberrinni Octopusini", "Chimpanzini Bananini", "Bombardiro Crocodilo", "Elefanto Cocofanto", "Bombombini Gusini", "Pandaccini Bananini", "Chef Crabracadabra",
     "Gorillo Watermelondrillo", "Frigo Camelo", "Girafa Celestre", "Ganganzelli Trulala", "Tigroligre Frutonni", "Matteo", "Cavallo Virtuoso", "La Vacca Saturno Saturnita", "Esok Sekolah", "Tralaledon", "Tralalero Tralala", "Chicleteira Bicicleteira", "Garama and Madundung",
-    "Meowl", "Capitano Clash Warnini", "Strawberry Elephant", "Lucky Block"
+    "Caramelini Brasilini", "Meowl", "Capitano Clash Warnini", "Strawberry Elephant"
 }
 
 local sellTargets = {}
@@ -1116,13 +1116,18 @@ task.spawn(function()
                     for _, slotModel in pairs(slotsFolder:GetChildren()) do
                         local uiFrame = slotModel:FindFirstChild("Brainrot_UI") and slotModel.Brainrot_UI:FindFirstChild("Frame")
                         if uiFrame then
-                            local brName = uiFrame:FindFirstChild("Title") and uiFrame.Title.Text
+                            local brNameLabel = uiFrame:FindFirstChild("Title")
                             local brTypeLabel = uiFrame:FindFirstChild("Type")
                             
-                            if brName and sellTargets[brName] and sellTargets[brName].Active then
-                                local mutType = (brTypeLabel.Text == "" or brTypeLabel.Text == nil) and "Normal" or brTypeLabel.Text
-                                if sellTargets[brName].Muts[mutType] then
-                                    Bridge:FireServer("General", "Brainrots", "Sell", slotModel.Name)
+                            if brNameLabel then
+                                local brName = brNameLabel.Text
+                                local config = sellTargets[brName]
+                                
+                                if config and config.Active then
+                                    local mutType = (brTypeLabel.Text == "" or brTypeLabel.Text == nil) and "Normal" or brTypeLabel.Text
+                                    if config.Muts[mutType] then
+                                        Bridge:FireServer("General", "Brainrots", "Sell", slotModel.Name)
+                                    end
                                 end
                             end
                         end

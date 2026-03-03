@@ -510,6 +510,7 @@ local buyStar = createOption("Auto Star", false, "Buy")
 local buyFlow = createOption("Auto Flower", false, "Buy")
 local buyPhon = createOption("Auto Phone", false, "Buy")
 local buyTaco = createOption("Auto Taco", false, "Buy")
+local isAutoSpin = createOption("Auto Spin", false, "Buy")
 
 local isAntiAFK = createOption("Anti AFK", false, "Config")
 local isAntiCheat = createOption("Anti Cheat", false, "Config")
@@ -1140,6 +1141,17 @@ task.spawn(function()
                     end
                 end
             end
+        end
+    end
+end)
+
+task.spawn(function()
+    local Bridge = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Bridge")
+    while task.wait(6) do
+        if isAutoSpin() then
+            pcall(function()
+                Bridge:FireServer("General", "Spin Wheel", "Spin", false)
+            end)
         end
     end
 end)

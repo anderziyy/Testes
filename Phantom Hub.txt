@@ -510,7 +510,6 @@ local buyStar = createOption("Auto Star", false, "Buy")
 local buyFlow = createOption("Auto Flower", false, "Buy")
 local buyPhon = createOption("Auto Phone", false, "Buy")
 local buyTaco = createOption("Auto Taco", false, "Buy")
-local buySpin = createOption("Auto Spin", false, "Buy")
 
 local isAntiAFK = createOption("Anti AFK", false, "Config")
 local isAntiCheat = createOption("Anti Cheat", false, "Config")
@@ -1081,9 +1080,7 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-local function isAnyBuyActive() 
-    return buyIce() or buyVic() or buyStar() or buyFlow() or buyPhon() or buyTaco() or buySpin() 
-end
+local function isAnyBuyActive() return buyIce() or buyVic() or buyStar() or buyFlow() or buyPhon() or buyTaco() end
 
 PlayerGui.Notification.DescendantAdded:Connect(function(descendant)
     if isAutoRebirth() or isAnyBuyActive() then
@@ -1092,17 +1089,6 @@ PlayerGui.Notification.DescendantAdded:Connect(function(descendant)
             local text = ""
             pcall(function() text = descendant:IsA("TextLabel") and descendant.Text or descendant.Value.Text end)
             if text:find("enough money") or text:find("necessary Brainrots") or isAnyBuyActive() then descendant:Destroy() end
-        end
-    end
-end)
-
-task.spawn(function()
-    local Bridge = ReplicatedStorage:WaitForChild("Remotes", 5):WaitForChild("Bridge")
-    while task.wait(1) do
-        if buySpin() then
-            pcall(function()
-                Bridge:FireServer("General", "Spin Wheel", "Spin", false)
-            end)
         end
     end
 end)

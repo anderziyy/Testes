@@ -754,9 +754,12 @@ local function showTab(tabName)
             v.Visible = (t == tabName)
         end
     end
+    
+    SellListContainer.Visible = false
     DropdownFrame.Visible = false
     IndexMutContainer.Visible = false
     SpecificListContainer.Visible = false
+    
     repositionElements(tabName)
 end
 

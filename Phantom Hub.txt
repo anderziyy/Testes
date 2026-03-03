@@ -35,10 +35,22 @@ local sellBrainrots = {
     "Meowl", "Capitano Clash Warnini", "Strawberry Elephant", "Lucky Block"
 }
 
-local sellTargets = {}
+local sellTargets = savedSettings.SellTargets or {}
 for _, brName in ipairs(sellBrainrots) do
-    sellTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}}
+    if not sellTargets[brName] then
+        sellTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}}
+    end
 end
+savedSettings.SellTargets = sellTargets
+
+local specificTargets = savedSettings.SpecificTargets or {}
+for _, brName in ipairs(allBrainrots) do
+    if not specificTargets[brName] then
+        specificTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}}
+    end
+end
+savedSettings.SpecificTargets = specificTargets
+saveSettings()
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PhantomHub_V1"
@@ -391,38 +403,30 @@ end)
 local isInstantBrainrot = createOption("Instant Collect Brainrots", false, "Main")
 
 local isAutoSell, SellContainer, SellSwitch = createOption("Auto Sell Brainrots", false, "Main")
-
 local SellListContainer = Instance.new("Frame")
 SellListContainer.Size = UDim2.new(0.95, 0, 0, 400)
 SellListContainer.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 SellListContainer.Visible = false
 SellListContainer.Parent = MainContent
 Instance.new("UICorner", SellListContainer).CornerRadius = UDim.new(0, 10)
-
 local sellScroll = Instance.new("ScrollingFrame")
 sellScroll.Size = UDim2.new(1, 0, 1, 0)
 sellScroll.BackgroundTransparency = 1
 sellScroll.ScrollBarThickness = 2
-sellScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 sellScroll.Parent = SellListContainer
-
 local sellLayout = Instance.new("UIListLayout")
 sellLayout.SortOrder = Enum.SortOrder.LayoutOrder
 sellLayout.Parent = sellScroll
-
 local sellClickArea = Instance.new("TextButton")
 sellClickArea.Size = UDim2.new(0.6, 0, 1, 0)
 sellClickArea.BackgroundTransparency = 1
 sellClickArea.Text = ""
 sellClickArea.Parent = SellContainer
-
 sellClickArea.MouseButton1Click:Connect(function()
     SellListContainer.Visible = not SellListContainer.Visible
     repositionElements("Main")
 end)
-
 table.insert(options["Main"], SellListContainer)
-
 local ySellSize = 0
 for _, brName in ipairs(sellBrainrots) do
     local itemFrame = Instance.new("Frame")
@@ -430,7 +434,6 @@ for _, brName in ipairs(sellBrainrots) do
     itemFrame.BackgroundTransparency = 1
     itemFrame.Parent = sellScroll
     ySellSize = ySellSize + 35
-
     local nameBtn = Instance.new("TextButton")
     nameBtn.Size = UDim2.new(0.7, 0, 1, 0)
     nameBtn.Position = UDim2.new(0.05, 0, 0, 0)
@@ -441,50 +444,45 @@ for _, brName in ipairs(sellBrainrots) do
     nameBtn.Font = Enum.Font.SourceSans
     nameBtn.TextSize = 14
     nameBtn.Parent = itemFrame
-
     local checkBtn = Instance.new("TextButton")
     checkBtn.Size = UDim2.new(0, 20, 0, 20)
     checkBtn.Position = UDim2.new(0.85, 0, 0.5, -10)
-    checkBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    checkBtn.BackgroundColor3 = sellTargets[brName].Active and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(40, 40, 40)
     checkBtn.Text = ""
     checkBtn.Parent = itemFrame
     Instance.new("UICorner", checkBtn).CornerRadius = UDim.new(0, 4)
-
     local mutsFrame = Instance.new("Frame")
     mutsFrame.Size = UDim2.new(1, 0, 0, 35)
     mutsFrame.BackgroundTransparency = 1
     mutsFrame.Visible = false
     mutsFrame.Parent = sellScroll
-
     local smLayout = Instance.new("UIGridLayout")
     smLayout.CellSize = UDim2.new(0, 55, 0, 25)
     smLayout.Parent = mutsFrame
-
     for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy"}) do
         local mBtn = Instance.new("TextButton")
-        mBtn.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+        mBtn.BackgroundColor3 = sellTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
         mBtn.Text = m:sub(1,3)
         mBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
         mBtn.TextSize = 11
         mBtn.Parent = mutsFrame
         Instance.new("UICorner", mBtn)
-
         mBtn.MouseButton1Click:Connect(function()
             sellTargets[brName].Muts[m] = not sellTargets[brName].Muts[m]
             mBtn.BackgroundColor3 = sellTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
+            saveSettings()
         end)
     end
-
     nameBtn.MouseButton1Click:Connect(function()
         mutsFrame.Visible = not mutsFrame.Visible
         local addY = mutsFrame.Visible and 35 or -35
         ySellSize = ySellSize + addY
         sellScroll.CanvasSize = UDim2.new(0, 0, 0, ySellSize)
     end)
-
     checkBtn.MouseButton1Click:Connect(function()
         sellTargets[brName].Active = not sellTargets[brName].Active
         checkBtn.BackgroundColor3 = sellTargets[brName].Active and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(40, 40, 40)
+        saveSettings()
     end)
 end
 sellScroll.CanvasSize = UDim2.new(0, 0, 0, ySellSize)
@@ -641,24 +639,20 @@ indexClickArea.MouseButton1Click:Connect(function()
 end)
 
 local isAutoSpecific, SpecContainer, SpecSwitch = createOption("Auto Specific Brainrot", false, "Farm")
-
 local SpecificListContainer = Instance.new("Frame")
 SpecificListContainer.Size = UDim2.new(0.95, 0, 0, 400)
 SpecificListContainer.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 SpecificListContainer.Visible = false
 SpecificListContainer.Parent = MainContent
 Instance.new("UICorner", SpecificListContainer).CornerRadius = UDim.new(0, 10)
-
 local specScroll = Instance.new("ScrollingFrame")
 specScroll.Size = UDim2.new(1, 0, 1, 0)
 specScroll.BackgroundTransparency = 1
 specScroll.ScrollBarThickness = 2
-specScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 specScroll.Parent = SpecificListContainer
 local specLayout = Instance.new("UIListLayout")
 specLayout.SortOrder = Enum.SortOrder.LayoutOrder
 specLayout.Parent = specScroll
-
 local specClickArea = Instance.new("TextButton")
 specClickArea.Size = UDim2.new(0.6, 0, 1, 0)
 specClickArea.BackgroundTransparency = 1
@@ -669,29 +663,13 @@ specClickArea.MouseButton1Click:Connect(function()
     repositionElements("Farm")
 end)
 table.insert(options["Farm"], SpecificListContainer)
-
-local allBrainrots = {
-    "Tim Cheese", "LiriliLarila", "Fluri Flura", "Cacto Hipopotamo", "Pipi Potato", "Tric Trac Barabum", "Burbaloni Loliloli",
-    "Boneca Ambalabu", "Trippi Troppi", "Svinina Bombardino", "Bambini Crostini", "Avocadini Guffo", "Bandito Bobrito", "Tatatata Sahur",
-    "Gangster Footera", "Tung Tung Sahur", "Cappuccino Assassino", "Pipi Kiwi", "Orangutini Ananassini", "Talpa Di Fero", "Espresso Signora",
-    "Brr Brr Patapim", "Rhino Toasterino", "Brr Bicus Dicus", "Strawberrelli Flamingelli", "Bananito Delfinito", "Balerina Capucina", "Glorbo Fruttodrillo",
-    "Blueberrinni Octopusini", "Chimpanzini Bananini", "Bombardiro Crocodilo", "Elefanto Cocofanto", "Bombombini Gusini", "Pandaccini Bananini", "Chef Crabracadabra",
-    "Gorillo Watermelondrillo", "Frigo Camelo", "Girafa Celestre", "Ganganzelli Trulala", "Tigroligre Frutonni", "Matteo", "Cavallo Virtuoso", "La Vacca Saturno Saturnita", "Esok Sekolah", "Tralaledon", "Tralalero Tralala", "Chicleteira Bicicleteira", "Garama and Madundung",
-    "Meowl", "Capitano Clash Warnini", "Strawberry Elephant", "Lucky Block"
-}
-
-local specificTargets = {}
-
 local ySpecSize = 0
 for _, brName in ipairs(allBrainrots) do
-    specificTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}}
-    
     local itemFrame = Instance.new("Frame")
     itemFrame.Size = UDim2.new(1, 0, 0, 35)
     itemFrame.BackgroundTransparency = 1
     itemFrame.Parent = specScroll
     ySpecSize = ySpecSize + 35
-    
     local nameBtn = Instance.new("TextButton")
     nameBtn.Size = UDim2.new(0.7, 0, 1, 0)
     nameBtn.Position = UDim2.new(0.05, 0, 0, 0)
@@ -702,28 +680,24 @@ for _, brName in ipairs(allBrainrots) do
     nameBtn.Font = Enum.Font.SourceSans
     nameBtn.TextSize = 14
     nameBtn.Parent = itemFrame
-
     local checkBtn = Instance.new("TextButton")
     checkBtn.Size = UDim2.new(0, 20, 0, 20)
     checkBtn.Position = UDim2.new(0.85, 0, 0.5, -10)
-    checkBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    checkBtn.BackgroundColor3 = specificTargets[brName].Active and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(40, 40, 40)
     checkBtn.Text = ""
     checkBtn.Parent = itemFrame
     Instance.new("UICorner", checkBtn).CornerRadius = UDim.new(0, 4)
-
     local mutsFrame = Instance.new("Frame")
     mutsFrame.Size = UDim2.new(1, 0, 0, 35)
     mutsFrame.BackgroundTransparency = 1
     mutsFrame.Visible = false
     mutsFrame.Parent = specScroll
-    
     local smLayout = Instance.new("UIGridLayout")
     smLayout.CellSize = UDim2.new(0, 50, 0, 25)
     smLayout.Parent = mutsFrame
-
     for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy"}) do
         local mBtn = Instance.new("TextButton")
-        mBtn.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+        mBtn.BackgroundColor3 = specificTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
         mBtn.Text = m:sub(1,3)
         mBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
         mBtn.TextSize = 12
@@ -732,22 +706,34 @@ for _, brName in ipairs(allBrainrots) do
         mBtn.MouseButton1Click:Connect(function()
             specificTargets[brName].Muts[m] = not specificTargets[brName].Muts[m]
             mBtn.BackgroundColor3 = specificTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
+            saveSettings()
         end)
     end
-
     nameBtn.MouseButton1Click:Connect(function()
         mutsFrame.Visible = not mutsFrame.Visible
         local addY = mutsFrame.Visible and 35 or -35
         ySpecSize = ySpecSize + addY
         specScroll.CanvasSize = UDim2.new(0, 0, 0, ySpecSize)
     end)
-
     checkBtn.MouseButton1Click:Connect(function()
         specificTargets[brName].Active = not specificTargets[brName].Active
         checkBtn.BackgroundColor3 = specificTargets[brName].Active and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(40, 40, 40)
+        saveSettings()
     end)
 end
 specScroll.CanvasSize = UDim2.new(0, 0, 0, ySpecSize)
+
+local allBrainrots = sellBrainrots
+
+local allBrainrots = {
+    "Tim Cheese", "LiriliLarila", "Fluri Flura", "Cacto Hipopotamo", "Pipi Potato", "Tric Trac Barabum", "Burbaloni Loliloli",
+    "Boneca Ambalabu", "Trippi Troppi", "Svinina Bombardino", "Bambini Crostini", "Avocadini Guffo", "Bandito Bobrito", "Tatatata Sahur",
+    "Gangster Footera", "Tung Tung Sahur", "Cappuccino Assassino", "Pipi Kiwi", "Orangutini Ananassini", "Talpa Di Fero", "Espresso Signora",
+    "Brr Brr Patapim", "Rhino Toasterino", "Brr Bicus Dicus", "Strawberrelli Flamingelli", "Bananito Delfinito", "Balerina Capucina", "Glorbo Fruttodrillo",
+    "Blueberrinni Octopusini", "Chimpanzini Bananini", "Bombardiro Crocodilo", "Elefanto Cocofanto", "Bombombini Gusini", "Pandaccini Bananini", "Chef Crabracadabra",
+    "Gorillo Watermelondrillo", "Frigo Camelo", "Girafa Celestre", "Ganganzelli Trulala", "Tigroligre Frutonni", "Matteo", "Cavallo Virtuoso", "La Vacca Saturno Saturnita", "Esok Sekolah", "Tralaledon", "Tralalero Tralala", "Chicleteira Bicicleteira", "Garama and Madundung",
+    "Meowl", "Capitano Clash Warnini", "Strawberry Elephant", "Lucky Block"
+}
 
 function showTab(tabName)
     activeTab = tabName
@@ -1067,7 +1053,6 @@ end)
 task.spawn(function()
     local Bridge = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Bridge")
     local Player = game:GetService("Players").LocalPlayer
-
     local function getMyBaseName()
         local serverBases = workspace:FindFirstChild("Server") and workspace.Server:FindFirstChild("Bases")
         if serverBases then
@@ -1080,7 +1065,6 @@ task.spawn(function()
         end
         return nil
     end
-
     while task.wait(1) do
         if isAutoSell() then
             local myBaseName = getMyBaseName()
@@ -1088,14 +1072,12 @@ task.spawn(function()
                 local clientBases = workspace:FindFirstChild("Client") and workspace.Client:FindFirstChild("Bases")
                 local myClientBase = clientBases and clientBases:FindFirstChild(myBaseName)
                 local slotsFolder = myClientBase and myClientBase:FindFirstChild("Slots")
-
                 if slotsFolder then
                     for _, slotModel in pairs(slotsFolder:GetChildren()) do
                         local uiFrame = slotModel:FindFirstChild("Brainrot_UI") and slotModel.Brainrot_UI:FindFirstChild("Frame")
                         if uiFrame then
                             local brName = uiFrame:FindFirstChild("Title") and uiFrame.Title.Text
                             local brTypeLabel = uiFrame:FindFirstChild("Type")
-                            
                             if brName and sellTargets[brName] and sellTargets[brName].Active then
                                 local mutType = (brTypeLabel.Text == "" or brTypeLabel.Text == nil) and "Normal" or brTypeLabel.Text
                                 if sellTargets[brName].Muts[mutType] then

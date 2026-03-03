@@ -480,7 +480,6 @@ for _, brName in ipairs(sellBrainrots) do
         local addY = mutsFrame.Visible and 35 or -35
         ySellSize = ySellSize + addY
         sellScroll.CanvasSize = UDim2.new(0, 0, 0, ySellSize)
-        repositionElements("Main")
     end)
 
     checkBtn.MouseButton1Click:Connect(function()
@@ -497,12 +496,10 @@ local function showTab(tabName)
             v.Visible = (t == tabName)
         end
     end
-    
-    SellListContainer.Visible = false
     DropdownFrame.Visible = false
     IndexMutContainer.Visible = false
     SpecificListContainer.Visible = false
-    
+    SellListContainer.Visible = false
     repositionElements(tabName)
 end
 
@@ -1113,14 +1110,7 @@ task.spawn(function()
                             local brTypeLabel = uiFrame:FindFirstChild("Type")
                             
                             if brName and sellTargets[brName] and sellTargets[brName].Active then
-                                local mutText = brTypeLabel and brTypeLabel.Text or ""
-                                local mutType = "Normal"
-                                
-                                if mutText:find("Gold") then mutType = "Gold"
-                                elseif mutText:find("Diamond") then mutType = "Diamond"
-                                elseif mutText:find("Rainbow") then mutType = "Rainbow"
-                                elseif mutText:find("Galaxy") then mutType = "Galaxy" end
-
+                                local mutType = (brTypeLabel.Text == "" or brTypeLabel.Text == nil) and "Normal" or brTypeLabel.Text
                                 if sellTargets[brName].Muts[mutType] then
                                     Bridge:FireServer("General", "Brainrots", "Sell", slotModel.Name)
                                 end

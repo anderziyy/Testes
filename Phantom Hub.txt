@@ -489,20 +489,6 @@ for _, brName in ipairs(sellBrainrots) do
 end
 sellScroll.CanvasSize = UDim2.new(0, 0, 0, ySellSize)
 
-local function showTab(tabName)
-    activeTab = tabName
-    for t, list in pairs(options) do
-        for _, v in pairs(list) do
-            v.Visible = (t == tabName)
-        end
-    end
-    DropdownFrame.Visible = false
-    IndexMutContainer.Visible = false
-    SpecificListContainer.Visible = false
-    SellListContainer.Visible = false
-    repositionElements(tabName)
-end
-
 local isGodRagdoll = createOption("Anti Ragdoll", true, "Main")
 
 local buyIce = createOption("Auto Ice Emblem", false, "Buy")
@@ -773,6 +759,7 @@ local function showTab(tabName)
     DropdownFrame.Visible = false
     IndexMutContainer.Visible = false
     SpecificListContainer.Visible = false
+    SellListContainer.Visible = false
     repositionElements(tabName)
 end
 

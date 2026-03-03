@@ -421,8 +421,6 @@ sellClickArea.MouseButton1Click:Connect(function()
     repositionElements("Main")
 end)
 
-table.insert(options["Main"], SellListContainer)
-
 local ySellSize = 0
 for _, brName in ipairs(sellBrainrots) do
     local itemFrame = Instance.new("Frame")

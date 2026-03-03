@@ -421,6 +421,8 @@ sellClickArea.MouseButton1Click:Connect(function()
     repositionElements("Main")
 end)
 
+table.insert(options["Main"], SellListContainer)
+
 local ySellSize = 0
 for _, brName in ipairs(sellBrainrots) do
     local itemFrame = Instance.new("Frame")
@@ -754,12 +756,9 @@ local function showTab(tabName)
             v.Visible = (t == tabName)
         end
     end
-    
-    SellListContainer.Visible = false
     DropdownFrame.Visible = false
     IndexMutContainer.Visible = false
     SpecificListContainer.Visible = false
-    
     repositionElements(tabName)
 end
 

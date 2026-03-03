@@ -556,6 +556,7 @@ local buyStar = createOption("Auto Star", false, "Buy")
 local buyFlow = createOption("Auto Flower", false, "Buy")
 local buyPhon = createOption("Auto Phone", false, "Buy")
 local buyTaco = createOption("Auto Taco", false, "Buy")
+local isAutoSpin = createOption("Auto Spin", false, "Buy")
 
 local isInvisible = createOption("Invisibility", false, "Config", function(active)
     local char = Player.Character
@@ -1241,6 +1242,35 @@ task.spawn(function()
                         end
                     end
                 end
+            end
+        end
+    end
+end)
+
+task.spawn(function()
+    local Bridge = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Bridge")
+    local MainModule = nil
+    pcall(function() MainModule = require(game:GetService("Players").LocalPlayer.PlayerScripts:WaitForChild("Client"):WaitForChild("Main")) end)
+
+    while task.wait(1) do
+        if isAutoSpin() then
+            local canSpin = false
+            pcall(function()
+                if MainModule and MainModule.Data then
+                    if MainModule.Data.Spins and MainModule.Data.Spins >= 1 then
+                        canSpin = true
+                    elseif MainModule.Data.Last_Free_Spin then
+                        local timeLeft = 3600 - (DateTime.now().UnixTimestamp - MainModule.Data.Last_Free_Spin)
+                        if timeLeft <= 0 then
+                            canSpin = true
+                        end
+                    end
+                end
+            end)
+
+            if canSpin then
+                Bridge:FireServer("General", "SpinWheel", "Spin", false)
+                task.wait(5)
             end
         end
     end

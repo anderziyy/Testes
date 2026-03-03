@@ -480,6 +480,7 @@ for _, brName in ipairs(sellBrainrots) do
         local addY = mutsFrame.Visible and 35 or -35
         ySellSize = ySellSize + addY
         sellScroll.CanvasSize = UDim2.new(0, 0, 0, ySellSize)
+        repositionElements("Main")
     end)
 
     checkBtn.MouseButton1Click:Connect(function()
@@ -488,6 +489,22 @@ for _, brName in ipairs(sellBrainrots) do
     end)
 end
 sellScroll.CanvasSize = UDim2.new(0, 0, 0, ySellSize)
+
+local function showTab(tabName)
+    activeTab = tabName
+    for t, list in pairs(options) do
+        for _, v in pairs(list) do
+            v.Visible = (t == tabName)
+        end
+    end
+    
+    SellListContainer.Visible = false
+    DropdownFrame.Visible = false
+    IndexMutContainer.Visible = false
+    SpecificListContainer.Visible = false
+    
+    repositionElements(tabName)
+end
 
 local isGodRagdoll = createOption("Anti Ragdoll", true, "Main")
 
@@ -1096,7 +1113,14 @@ task.spawn(function()
                             local brTypeLabel = uiFrame:FindFirstChild("Type")
                             
                             if brName and sellTargets[brName] and sellTargets[brName].Active then
-                                local mutType = (brTypeLabel.Text == "" or brTypeLabel.Text == nil) and "Normal" or brTypeLabel.Text
+                                local mutText = brTypeLabel and brTypeLabel.Text or ""
+                                local mutType = "Normal"
+                                
+                                if mutText:find("Gold") then mutType = "Gold"
+                                elseif mutText:find("Diamond") then mutType = "Diamond"
+                                elseif mutText:find("Rainbow") then mutType = "Rainbow"
+                                elseif mutText:find("Galaxy") then mutType = "Galaxy" end
+
                                 if sellTargets[brName].Muts[mutType] then
                                     Bridge:FireServer("General", "Brainrots", "Sell", slotModel.Name)
                                 end

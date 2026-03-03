@@ -682,7 +682,7 @@ specClickArea.MouseButton1Click:Connect(function()
     repositionElements("Farm")
 end)
 table.insert(options["Farm"], SpecificListContainer)
-
+    
 local allBrainrots = {
     "Tim Cheese", "LiriliLarila", "Fluri Flura", "Cacto Hipopotamo", "Pipi Potato", "Tric Trac Barabum", "Burbaloni Loliloli",
     "Boneca Ambalabu", "Trippi Troppi", "Svinina Bombardino", "Bambini Crostini", "Avocadini Guffo", "Bandito Bobrito", "Tatatata Sahur",
@@ -690,7 +690,13 @@ local allBrainrots = {
     "Brr Brr Patapim", "Rhino Toasterino", "Brr Bicus Dicus", "Strawberrelli Flamingelli", "Bananito Delfinito", "Balerina Capucina", "Glorbo Fruttodrillo",
     "Blueberrinni Octopusini", "Chimpanzini Bananini", "Bombardiro Crocodilo", "Elefanto Cocofanto", "Bombombini Gusini", "Pandaccini Bananini", "Chef Crabracadabra",
     "Gorillo Watermelondrillo", "Frigo Camelo", "Girafa Celestre", "Ganganzelli Trulala", "Tigroligre Frutonni", "Matteo", "Cavallo Virtuoso", "La Vacca Saturno Saturnita", "Esok Sekolah", "Tralaledon", "Tralalero Tralala", "Chicleteira Bicicleteira", "Garama and Madundung",
-    "Meowl", "Capitano Clash Warnini", "Strawberry Elephant", "Lucky Block"
+    "Caramelini Brasilini", "Meowl", "Capitano Clash Warnini", "Strawberry Elephant", "Lucky Block"
+}
+
+local secretNames = {
+    ["La Vacca Saturno Saturnita"] = true, ["Esok Sekolah"] = true, ["Tralaledon"] = true, 
+    ["Garama and Madundung"] = true, ["Tralalero Tralala"] = true, ["Chicleteira Bicicleteira"] = true, 
+    ["Lucky Block"] = true, ["Caramelini Brasilini"] = true
 }
 
 local specificTargets = {}

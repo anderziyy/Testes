@@ -749,7 +749,7 @@ for _, brName in ipairs(allBrainrots) do
 end
 specScroll.CanvasSize = UDim2.new(0, 0, 0, ySpecSize)
 
-local function showTab(tabName)
+function showTab(tabName)
     activeTab = tabName
     for t, list in pairs(options) do
         for _, v in pairs(list) do

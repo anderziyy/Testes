@@ -380,20 +380,66 @@ local isAutoBuyBrainrot = createOption("Auto Buy Brainrots", false, "Main")
 local isAutoCollect = createOption("Auto Collect Money", false, "Main")
 local isPlayerESP = createOption("Player ESP (Red Aura)", false, "Main")
 
-local originalMaterials = {}
+local originalSettings = {}
+local lowModeConn = nil
+
+local function applyAgressiveLow(v)
+    if v:IsA("BasePart") then
+        if not originalSettings[v] then
+            originalSettings[v] = {v.Material, v.Reflectance, v.CastShadow}
+        end
+        v.Material = Enum.Material.SmoothPlastic
+        v.Reflectance = 0
+        v.CastShadow = false
+    elseif v:IsA("Decal") or v:IsA("Texture") then
+        if not originalSettings[v] then originalSettings[v] = v.Transparency end
+        v.Transparency = 1
+    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") or v:IsA("Fire") or v:IsA("Smoke") or v:IsA("Sparkles") then
+        if not originalSettings[v] then originalSettings[v] = v.Enabled end
+        v.Enabled = false
+    elseif v:IsA("PostEffect") or v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then
+        if not originalSettings[v] then originalSettings[v] = v.Enabled end
+        v.Enabled = false
+    end
+end
+
 local isLowMode = createOption("Low Mode", false, "Main", function(active)
     if active then
-        for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("BasePart") and (v.Name == "Part" or v.Name == "Floor") then
-                originalMaterials[v] = v.Material
-                v.Material = Enum.Material.Air
+        originalSettings["Lighting"] = {game.Lighting.GlobalShadows, game.Lighting.FogEnd, game.Lighting.Brightness}
+        game.Lighting.GlobalShadows = false
+        game.Lighting.Brightness = 2
+        game.Lighting.FogEnd = 100000
+        
+        for _, v in pairs(workspace:GetDescendants()) do applyAgressiveLow(v) end
+        for _, v in pairs(game.Lighting:GetChildren()) do applyAgressiveLow(v) end
+        
+        lowModeConn = workspace.DescendantAdded:Connect(function(child)
+            task.wait()
+            applyAgressiveLow(child)
+        end)
+    else
+        if lowModeConn then lowModeConn:Disconnect() lowModeConn = nil end
+        
+        if originalSettings["Lighting"] then
+            game.Lighting.GlobalShadows = originalSettings["Lighting"][1]
+            game.Lighting.FogEnd = originalSettings["Lighting"][2]
+            game.Lighting.Brightness = originalSettings["Lighting"][3]
+        end
+        
+        for obj, data in pairs(originalSettings) do
+            if typeof(obj) == "Instance" and obj.Parent then
+                if obj:IsA("BasePart") then
+                    obj.Material = data[1]
+                    obj.Reflectance = data[2]
+                    obj.CastShadow = data[3]
+                elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                    obj.Transparency = data
+                elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") or obj:IsA("Fire") or obj:IsA("Smoke") or obj:IsA("Sparkles") or obj:IsA("PostEffect") or obj:IsA("BloomEffect") or obj:IsA("BlurEffect") or obj:IsA("SunRaysEffect") or obj:IsA("ColorCorrectionEffect") or obj:IsA("Atmosphere") then
+                    obj.Enabled = data
+                end
             end
         end
-    else
-        for part, mat in pairs(originalMaterials) do
-            if part and part.Parent then part.Material = mat end
-        end
-        originalMaterials = {}
+        originalSettings = {}
     end
 end)
 

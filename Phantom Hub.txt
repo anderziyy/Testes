@@ -1064,14 +1064,16 @@ PlayerGui.Notification.DescendantAdded:Connect(function(descendant)
 end)
 
 task.spawn(function()
-    local Bridge = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Bridge")
+    local Bridge = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Bridge")
     
+    -- Função melhorada para achar a SUA base
     local function getMyBaseName()
         local basesFolder = workspace:FindFirstChild("Server") and workspace.Server:FindFirstChild("Bases")
         if basesFolder then
             for _, b in pairs(basesFolder:GetChildren()) do
                 local ownerObj = b:FindFirstChild("OwnerId")
-                if ownerObj and ownerObj.Value == Player.UserId then
+                -- Verifica se o OwnerId existe e se o valor é o seu UserId
+                if ownerObj and (tonumber(ownerObj.Value) == game.Players.LocalPlayer.UserId) then
                     return b.Name
                 end
             end
@@ -1079,24 +1081,37 @@ task.spawn(function()
         return nil
     end
 
-    while task.wait(1) do
-        if isAutoSell() and MainModule and MainModule.Data then
+    while task.wait(1.5) do -- Um pouco mais lento para evitar lag/kick
+        if isAutoSell() then
             local myBaseName = getMyBaseName()
-            if myBaseName then
+            
+            -- Tenta acessar o MainModule e os Dados
+            if myBaseName and MainModule and MainModule.Data then
                 local myData = MainModule.Data[myBaseName]
+                
                 if myData and myData.Slots then
                     for slotName, slotData in pairs(myData.Slots) do
+                        -- Verifica se o slot não está vazio e tem um nome
                         if slotData and slotData.Name then
-                            local config = sellTargets[slotData.Name]
+                            local brName = tostring(slotData.Name)
+                            local config = sellTargets[brName]
+                            
+                            -- Se o Brainrot estiver na lista e estiver marcado como ATIVO
                             if config and config.Active then
                                 local mutType = slotData.Type or "Normal"
+                                
+                                -- Verifica se a mutação específica está marcada para venda
                                 if config.Muts[mutType] then
+                                    -- print("Vendendo: " .. brName .. " no slot: " .. slotName) -- Debug
                                     Bridge:FireServer("General", "Brainrots", "Sell", slotName)
                                 end
                             end
                         end
                     end
                 end
+            else
+                -- Se chegar aqui, o script não achou sua base ou o Data
+                -- warn("AutoSell: Base ou Data não encontrados para " .. tostring(myBaseName))
             end
         end
     end

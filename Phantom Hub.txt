@@ -603,6 +603,23 @@ local isAutoLegendary = createOption("Auto Legendary", false, "Farm")
 local isAutoMystic = createOption("Auto Mystic", false, "Farm")
 local isAutoSecret = createOption("Auto Secret", false, "Farm")
 local isAutoStellar = createOption("Auto Stellar", false, "Farm")
+local isAutoServerHop = createOption("Auto Server Hop (Secret/Stellar)", false, "Farm")
+
+local function serverHop()
+    local sfUrl = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+    local success, result = pcall(function()
+        return game:HttpGet(sfUrl)
+    end)
+    if success then
+        local decode = HttpService:JSONDecode(result)
+        for _, server in pairs(decode.data) do
+            if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, Player)
+                break
+            end
+        end
+    end
+end
 
 local isRebirthAutoActive = false
 local currentRebirthSelect = 0
@@ -1272,6 +1289,43 @@ task.spawn(function()
                 Bridge:FireServer("General", "SpinWheel", "Spin", false)
                 task.wait(5)
             end
+        end
+    end
+end)
+
+task.spawn(function()
+    local lastFoundTime = tick()
+    while task.wait(2) do
+        if isAutoServerHop() then
+            local foundGood = false
+            local brainrots = workspace.Client.Path.Brainrots:GetChildren()
+            
+            for _, model in pairs(brainrots) do
+                local ui = model:FindFirstChild("Brainrot_UI")
+                local frame = ui and ui:FindFirstChild("Frame")
+                local rarityLbl = frame and frame:FindFirstChild("Rarity")
+                local titleLbl = frame and frame:FindFirstChild("Title")
+                
+                if rarityLbl and titleLbl then
+                    local rarityText = rarityLbl.Text:lower()
+                    local titleText = titleLbl.Text
+                    if rarityText:find("secret") or rarityText:find("stellar") or secretNames[titleText] or stellarNames[titleText] then
+                        foundGood = true
+                        break
+                    end
+                end
+            end
+            
+            if foundGood then
+                lastFoundTime = tick()
+            else
+                if tick() - lastFoundTime > 15 then
+                    serverHop()
+                    lastFoundTime = tick()
+                end
+            end
+        else
+            lastFoundTime = tick()
         end
     end
 end)

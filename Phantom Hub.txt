@@ -1064,54 +1064,57 @@ PlayerGui.Notification.DescendantAdded:Connect(function(descendant)
 end)
 
 task.spawn(function()
-    local Bridge = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Bridge")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local Players = game:GetService("Players")
+    local Player = Players.LocalPlayer
+    local Bridge = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Bridge")
     
-    -- Função melhorada para achar a SUA base
+    -- Função aprimorada para achar o NOME da sua base (ex: "Base1", "Base2")
     local function getMyBaseName()
-        local basesFolder = workspace:FindFirstChild("Server") and workspace.Server:FindFirstChild("Bases")
+        local serverFolder = workspace:FindFirstChild("Server")
+        local basesFolder = serverFolder and serverFolder:FindFirstChild("Bases")
+        
         if basesFolder then
-            for _, b in pairs(basesFolder:GetChildren()) do
-                local ownerObj = b:FindFirstChild("OwnerId")
-                -- Verifica se o OwnerId existe e se o valor é o seu UserId
-                if ownerObj and (tonumber(ownerObj.Value) == game.Players.LocalPlayer.UserId) then
-                    return b.Name
+            for _, base in pairs(basesFolder:GetChildren()) do
+                local ownerValue = base:FindFirstChild("OwnerId")
+                -- Verifica se o ID do dono é o seu
+                if ownerValue and (tostring(ownerValue.Value) == tostring(Player.UserId)) then
+                    return base.Name
                 end
             end
         end
         return nil
     end
 
-    while task.wait(1.5) do -- Um pouco mais lento para evitar lag/kick
+    while task.wait(1) do -- Intervalo de 1 segundo para não dar lag
         if isAutoSell() then
             local myBaseName = getMyBaseName()
             
-            -- Tenta acessar o MainModule e os Dados
-            if myBaseName and MainModule and MainModule.Data then
-                local myData = MainModule.Data[myBaseName]
+            -- Tentativa de pegar os dados do MainModule ou da própria Base no Workspace
+            if myBaseName and _G.MainModule and _G.MainModule.Data then
+                local myData = _G.MainModule.Data[myBaseName]
                 
                 if myData and myData.Slots then
                     for slotName, slotData in pairs(myData.Slots) do
-                        -- Verifica se o slot não está vazio e tem um nome
                         if slotData and slotData.Name then
-                            local brName = tostring(slotData.Name)
-                            local config = sellTargets[brName]
+                            -- Verifica se o Brainrot está na sua lista de venda
+                            local config = sellTargets[slotData.Name]
                             
-                            -- Se o Brainrot estiver na lista e estiver marcado como ATIVO
                             if config and config.Active then
                                 local mutType = slotData.Type or "Normal"
                                 
-                                -- Verifica se a mutação específica está marcada para venda
+                                -- Verifica se essa mutação específica está marcada para venda
                                 if config.Muts[mutType] then
-                                    -- print("Vendendo: " .. brName .. " no slot: " .. slotName) -- Debug
-                                    Bridge:FireServer("General", "Brainrots", "Sell", slotName)
+                                    -- O SEU SCANNER MOSTROU: Bridge:FireServer("General", "Brainrots", "Sell", "SlotX")
+                                    Bridge:FireServer("General", "Brainrots", "Sell", tostring(slotName))
                                 end
                             end
                         end
                     end
                 end
             else
-                -- Se chegar aqui, o script não achou sua base ou o Data
-                -- warn("AutoSell: Base ou Data não encontrados para " .. tostring(myBaseName))
+                -- Caso o MainModule não esteja acessível, avisa no console para debug
+                warn("Aguardando carregamento dos dados da base ou MainModule não encontrado.")
             end
         end
     end

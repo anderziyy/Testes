@@ -32,7 +32,7 @@ local sellBrainrots = {
     "Brr Brr Patapim", "Rhino Toasterino", "Brr Bicus Dicus", "Strawberrelli Flamingelli", "Bananito Delfinito", "Balerina Capucina", "Glorbo Fruttodrillo",
     "Blueberrinni Octopusini", "Chimpanzini Bananini", "Bombardiro Crocodilo", "Elefanto Cocofanto", "Bombombini Gusini", "Pandaccini Bananini", "Chef Crabracadabra",
     "Gorillo Watermelondrillo", "Frigo Camelo", "Girafa Celestre", "Ganganzelli Trulala", "Tigroligre Frutonni", "Matteo", "Cavallo Virtuoso", "La Vacca Saturno Saturnita", "Esok Sekolah", "Tralaledon", "Tralalero Tralala", "Chicleteira Bicicleteira", "Garama and Madundung",
-    "Caramelini Brasilini", "Meowl", "Capitano Clash Warnini", "Strawberry Elephant", "Lucky Block"
+    "Caramelini Brasilini", "Meowl", "Capitano Clash Warnini", "Strawberry Elephant"
 }
 
 local sellTargets = {}
@@ -60,7 +60,6 @@ FloatingButton.Position = UDim2.new(0, 50, 0.5, -27)
 FloatingButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 FloatingButton.Text = ""
 FloatingButton.Parent = ScreenGui
-Instance.new("UICorner", FloatingButton).CornerRadius = UDim.new(0, 12)
 
 local UICornerBtn = Instance.new("UICorner")
 UICornerBtn.CornerRadius = UDim.new(0, 12)
@@ -71,7 +70,6 @@ InnerBtn.Size = UDim2.new(0, 48, 0, 48)
 InnerBtn.Position = UDim2.new(0.5, -24, 0.5, -24)
 InnerBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 InnerBtn.Parent = FloatingButton
-Instance.new("UICorner", InnerBtn).CornerRadius = UDim.new(0, 10)
 
 local UICornerInner = Instance.new("UICorner")
 UICornerInner.CornerRadius = UDim.new(0, 10)
@@ -92,7 +90,6 @@ MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175)
 MainFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
 local UICornerFrame = Instance.new("UICorner")
 UICornerFrame.CornerRadius = UDim.new(0, 12)
@@ -103,7 +100,6 @@ InnerFrame.Size = UDim2.new(1, -6, 1, -6)
 InnerFrame.Position = UDim2.new(0, 3, 0, 3)
 InnerFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 InnerFrame.Parent = MainFrame
-Instance.new("UICorner", InnerFrame).CornerRadius = UDim.new(0, 10)
 
 local UICornerInnerF = Instance.new("UICorner")
 UICornerInnerF.CornerRadius = UDim.new(0, 10)
@@ -113,7 +109,6 @@ local TopBar = Instance.new("Frame")
 TopBar.Size = UDim2.new(1, 0, 0, 45)
 TopBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 TopBar.Parent = InnerFrame
-Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 10)
 
 local TopCorner = Instance.new("UICorner")
 TopCorner.CornerRadius = UDim.new(0, 10)
@@ -136,8 +131,9 @@ CloseBtn.Position = UDim2.new(1, -42, 0.5, -16)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 CloseBtn.Text = "X"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.Font = Enum.Font.SourceSansBold
+CloseBtn.TextSize = 18
 CloseBtn.Parent = TopBar
-Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 8)
 
 local UICornerClose = Instance.new("UICorner")
 UICornerClose.CornerRadius = UDim.new(0, 8)
@@ -154,10 +150,12 @@ MainContent.Size = UDim2.new(1, -145, 1, -55)
 MainContent.Position = UDim2.new(0, 145, 0, 50)
 MainContent.BackgroundTransparency = 1
 MainContent.ScrollBarThickness = 2
+MainContent.CanvasSize = UDim2.new(0, 0, 0, 2000)
 MainContent.Parent = InnerFrame
 
 local options = {Main = {}, Buy = {}, Farm = {}, Config = {}, Credits = {}}
 local activeTab = "Main"
+local uiElements = {}
 
 local function createTabBtn(name, posIdx)
     local Btn = Instance.new("TextButton")
@@ -191,13 +189,9 @@ local function repositionElements(tab)
 end
 
 local function createOption(name, startActive, tab, callback)
-    if savedSettings[name] ~= nil then startActive = savedSettings[name] end
-    local Container = Instance.new("Frame")
-    Container.Size = UDim2.new(0.95, 0, 0, 50)
-    Container.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    Container.Visible = (tab == activeTab)
-    Container.Parent = MainContent
-    Instance.new("UICorner", Container).CornerRadius = UDim.new(0, 10)
+    if savedSettings[name] ~= nil then
+        startActive = savedSettings[name]
+    end
 
     local Container = Instance.new("Frame")
     Container.Size = UDim2.new(0.95, 0, 0, 50)
@@ -233,22 +227,32 @@ local function createOption(name, startActive, tab, callback)
     Instance.new("UICorner", Circle).CornerRadius = UDim.new(1, 0)
 
     local active = startActive
-    if active and callback then task.spawn(function() callback(active) end) end
+    local retFunc = function() return active end
+
+    if active and callback then
+        task.spawn(function() callback(active) end)
+    end
 
     SwitchBG.MouseButton1Click:Connect(function()
         active = not active
         Circle:TweenPosition(active and UDim2.new(1, -21, 0.5, -9) or UDim2.new(0, 3, 0.5, -9), "Out", "Quad", 0.2, true)
         SwitchBG.BackgroundColor3 = active and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
+        
         savedSettings[name] = active
         saveSettings()
+
         if callback then callback(active) end
     end)
+
     table.insert(options[tab], Container)
-    return function() return active end, Container, SwitchBG
+    return retFunc, Container, SwitchBG
 end
 
 local function createSlider(name, min, max, default, tab, callback)
-    if savedSettings[name] ~= nil then default = savedSettings[name] end
+    if savedSettings[name] ~= nil then
+        default = savedSettings[name]
+    end
+
     local Container = Instance.new("Frame")
     Container.Size = UDim2.new(0.95, 0, 0, 60)
     Container.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
@@ -276,7 +280,8 @@ local function createSlider(name, min, max, default, tab, callback)
     Instance.new("UICorner", SliderBG).CornerRadius = UDim.new(1, 0)
 
     local SliderFill = Instance.new("Frame")
-    SliderFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+    local startScale = (default - min) / (max - min)
+    SliderFill.Size = UDim2.new(startScale, 0, 1, 0)
     SliderFill.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
     SliderFill.Parent = SliderBG
     Instance.new("UICorner", SliderFill).CornerRadius = UDim.new(1, 0)
@@ -299,20 +304,34 @@ local function createSlider(name, min, max, default, tab, callback)
         SliderFill.Size = UDim2.new(scale, 0, 1, 0)
         local value = math.floor(min + ((max - min) * scale))
         Label.Text = name .. ": " .. tostring(value)
+        
         savedSettings[name] = value
         saveSettings()
+
         if callback then callback(value) end
     end
 
-    SliderBG.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = true updateSlider(input) end end)
+    SliderBG.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            updateSlider(input)
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            updateSlider(input)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
 
-    UserInputService.InputChanged:Connect(function(input) if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then updateSlider(input) end end)
-
-    UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
     table.insert(options[tab], Container)
 end
 
-    local function createInfoBox(title, desc, tab, isButton, linkToCopy)
+local function createInfoBox(title, desc, tab, isButton, linkToCopy)
     local Container = Instance.new("Frame")
     Container.Size = UDim2.new(0.95, 0, 0, 50)
     Container.BackgroundColor3 = Color3.fromRGB(80, 80, 80)

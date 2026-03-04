@@ -992,7 +992,6 @@ RunService.Heartbeat:Connect(function()
 
     if not (autoEpic or autoLegendary or autoMystic or autoSecret or autoStellar or rActive or autoIdx or autoSpec) then 
         targetHead = nil 
-        if isHidden then setVisibility(true) end
         return 
     end
 
@@ -1001,13 +1000,11 @@ RunService.Heartbeat:Connect(function()
     if not root then return end
 
     if targetHead and targetHead.Parent and targetHead.Parent.Parent == brainrotsFolder then
-        root.CFrame = targetHead.CFrame
-        if not isHidden then setVisibility(false) end
+        root.CFrame = targetHead.CFrame * CFrame.new(0, -5, 0)
         return
     end
 
     targetHead = nil
-    if isHidden then setVisibility(true) end
 
     for _, model in pairs(brainrotsFolder:GetChildren()) do
         if model:IsA("Model") then
@@ -1050,7 +1047,7 @@ RunService.Heartbeat:Connect(function()
 
                 if isTarget then
                     targetHead = head
-                    root.CFrame = head.CFrame
+                    root.CFrame = head.CFrame * CFrame.new(0, -5, 0)
                     break
                 end
             end

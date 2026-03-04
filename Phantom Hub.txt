@@ -1052,7 +1052,7 @@ RunService.Heartbeat:Connect(function()
 
                 if isTarget then
                     targetHead = head
-                    root.CFrame = head.CFrame * CFrame.new(0, -10, 0)
+                    root.CFrame = head.CFrame * CFrame.new(0, -8, 0)
                     updateFarmCamera(head)
                     break
                 end

@@ -980,16 +980,19 @@ local function checkIndex(name, mutation)
     return false
 end
 
-local function updateFarmCamera(target)
-    local cam = workspace.CurrentCamera
-    if target then
-        cam.CameraSubject = target
-    else
-        local char = Player.Character
-        local hum = char and char:FindFirstChild("Humanoid")
-        if hum then cam.CameraSubject = hum end
+
+Player.CharacterAdded:Connect(function(char)
+    task.wait(0.5)
+    if isInvisible() then
+        for _, v in pairs(char:GetDescendants()) do
+            if v:IsA("BasePart") or v:IsA("Decal") then
+                if v.Name ~= "HumanoidRootPart" then v.Transparency = 1 end
+            elseif v:IsA("BillboardGui") or v:IsA("SurfaceGui") then
+                v.Enabled = false
+            end
+        end
     end
-end
+end)
 
 RunService.Heartbeat:Connect(function()
     local autoEpic = isAutoEpic()
@@ -1001,10 +1004,13 @@ RunService.Heartbeat:Connect(function()
     local autoSpec = isAutoSpecific()
     local rActive = isRebirthAutoActive and currentRebirthSelect > 0
 
-    if not (autoEpic or autoLegendary or autoMystic or autoSecret or autoStellar or rActive or autoIdx or autoSpec) then 
-        if targetHead then
-            targetHead = nil
-            updateFarmCamera(nil)
+    local isAnyFarmActive = (autoEpic or autoLegendary or autoMystic or autoSecret or autoStellar or rActive or autoIdx or autoSpec)
+
+    if not isAnyFarmActive then 
+        targetHead = nil 
+        if isHidden then 
+            setVisibility(true) 
+            workspace.CurrentCamera.CameraSubject = Player.Character:FindFirstChild("Humanoid")
         end
         return 
     end
@@ -1014,12 +1020,16 @@ RunService.Heartbeat:Connect(function()
     if not root then return end
 
     if targetHead and targetHead.Parent and targetHead.Parent.Parent == brainrotsFolder then
-        root.CFrame = targetHead.CFrame * CFrame.new(0, -10, 0)
-        updateFarmCamera(targetHead)
+        root.CFrame = targetHead.CFrame * CFrame.new(0, -7, 0)
+        workspace.CurrentCamera.CameraSubject = targetHead
+        if not isHidden then setVisibility(false) end
         return
     end
 
     targetHead = nil
+    workspace.CurrentCamera.CameraSubject = char:FindFirstChild("Humanoid")
+    if isHidden then setVisibility(true) end
+
     for _, model in pairs(brainrotsFolder:GetChildren()) do
         if model:IsA("Model") then
             local ui = model:FindFirstChild("Brainrot_UI")
@@ -1041,34 +1051,30 @@ RunService.Heartbeat:Connect(function()
                 elseif tText:find("Rainbow") then currentMut = "Rainbow"
                 elseif tText:find("Galaxy") then currentMut = "Galaxy" end
 
-                if autoIdx and mutSelected[currentMut] and titleText ~= "Lucky Block" and not checkIndex(titleText, currentMut) then isTarget = true
-                elseif autoSpec and specificTargets[titleText] and specificTargets[titleText].Active and specificTargets[titleText].Muts[currentMut] then isTarget = true
-                elseif autoEpic and (rarityText:find("epic") or epicNames[titleText]) then isTarget = true
-                elseif autoLegendary and (rarityText:find("legendary") or legendaryNames[titleText]) then isTarget = true
-                elseif autoMystic and (rarityText:find("mythic") or mythicNames[titleText]) then isTarget = true
-                elseif autoSecret and (rarityText:find("secret") or secretNames[titleText]) then isTarget = true
-                elseif autoStellar and (rarityText:find("stellar") or stellarNames[titleText]) then isTarget = true
-                elseif rActive and rebirthTargets[currentRebirthSelect] and rebirthTargets[currentRebirthSelect][titleText] then isTarget = true end
+                if autoIdx and mutSelected[currentMut] and titleText ~= "Lucky Block" and not checkIndex(titleText, currentMut) then 
+                    isTarget = true
+                elseif autoSpec and specificTargets[titleText] and specificTargets[titleText].Active and specificTargets[titleText].Muts[currentMut] then 
+                    isTarget = true
+                elseif autoEpic and (rarityText:find("epic") or epicNames[titleText]) then 
+                    isTarget = true
+                elseif autoLegendary and (rarityText:find("legendary") or legendaryNames[titleText]) then 
+                    isTarget = true
+                elseif autoMystic and (rarityText:find("mythic") or mythicNames[titleText]) then 
+                    isTarget = true
+                elseif autoSecret and (rarityText:find("secret") or secretNames[titleText]) then 
+                    isTarget = true
+                elseif autoStellar and (rarityText:find("stellar") or stellarNames[titleText]) then 
+                    isTarget = true
+                elseif rActive and rebirthTargets[currentRebirthSelect] and rebirthTargets[currentRebirthSelect][titleText] then 
+                    isTarget = true
+                end
 
                 if isTarget then
                     targetHead = head
-                    root.CFrame = head.CFrame * CFrame.new(0, -6, 0)
-                    updateFarmCamera(head)
+                    root.CFrame = head.CFrame * CFrame.new(0, -7, 0)
+                    workspace.CurrentCamera.CameraSubject = head
                     break
                 end
-            end
-        end
-    end
-end)
-
-Player.CharacterAdded:Connect(function(char)
-    task.wait(0.5)
-    if isInvisible() then
-        for _, v in pairs(char:GetDescendants()) do
-            if v:IsA("BasePart") or v:IsA("Decal") then
-                if v.Name ~= "HumanoidRootPart" then v.Transparency = 1 end
-            elseif v:IsA("BillboardGui") or v:IsA("SurfaceGui") then
-                v.Enabled = false
             end
         end
     end

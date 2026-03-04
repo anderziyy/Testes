@@ -1022,7 +1022,7 @@ RunService.Heartbeat:Connect(function()
     if not root then return end
 
     if targetHead and targetHead.Parent and targetHead.Parent.Parent == brainrotsFolder then
-        root.CFrame = targetHead.CFrame * CFrame.new(0, -15, 0)
+        root.CFrame = targetHead.CFrame * CFrame.new(0, -10, 0)
         root.Velocity = Vector3.new(0, 0, 0)
         if not isHidden then setVisibility(false) end
         return

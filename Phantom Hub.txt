@@ -980,20 +980,6 @@ local function checkIndex(name, mutation)
     return false
 end
 
-
-Player.CharacterAdded:Connect(function(char)
-    task.wait(0.5)
-    if isInvisible() then
-        for _, v in pairs(char:GetDescendants()) do
-            if v:IsA("BasePart") or v:IsA("Decal") then
-                if v.Name ~= "HumanoidRootPart" then v.Transparency = 1 end
-            elseif v:IsA("BillboardGui") or v:IsA("SurfaceGui") then
-                v.Enabled = false
-            end
-        end
-    end
-end)
-
 RunService.Heartbeat:Connect(function()
     local autoEpic = isAutoEpic()
     local autoLegendary = isAutoLegendary()
@@ -1004,14 +990,9 @@ RunService.Heartbeat:Connect(function()
     local autoSpec = isAutoSpecific()
     local rActive = isRebirthAutoActive and currentRebirthSelect > 0
 
-    local isAnyFarmActive = (autoEpic or autoLegendary or autoMystic or autoSecret or autoStellar or rActive or autoIdx or autoSpec)
-
-    if not isAnyFarmActive then 
+    if not (autoEpic or autoLegendary or autoMystic or autoSecret or autoStellar or rActive or autoIdx or autoSpec) then 
         targetHead = nil 
-        if isHidden then 
-            setVisibility(true) 
-            workspace.CurrentCamera.CameraSubject = Player.Character:FindFirstChild("Humanoid")
-        end
+        if isHidden then setVisibility(true) end
         return 
     end
 
@@ -1020,14 +1001,12 @@ RunService.Heartbeat:Connect(function()
     if not root then return end
 
     if targetHead and targetHead.Parent and targetHead.Parent.Parent == brainrotsFolder then
-        root.CFrame = targetHead.CFrame * CFrame.new(0, -7, 0)
-        workspace.CurrentCamera.CameraSubject = targetHead
+        root.CFrame = targetHead.CFrame
         if not isHidden then setVisibility(false) end
         return
     end
 
     targetHead = nil
-    workspace.CurrentCamera.CameraSubject = char:FindFirstChild("Humanoid")
     if isHidden then setVisibility(true) end
 
     for _, model in pairs(brainrotsFolder:GetChildren()) do
@@ -1071,10 +1050,22 @@ RunService.Heartbeat:Connect(function()
 
                 if isTarget then
                     targetHead = head
-                    root.CFrame = head.CFrame * CFrame.new(0, -7, 0)
-                    workspace.CurrentCamera.CameraSubject = head
+                    root.CFrame = head.CFrame
                     break
                 end
+            end
+        end
+    end
+end)
+
+Player.CharacterAdded:Connect(function(char)
+    task.wait(0.5)
+    if isInvisible() then
+        for _, v in pairs(char:GetDescendants()) do
+            if v:IsA("BasePart") or v:IsA("Decal") then
+                if v.Name ~= "HumanoidRootPart" then v.Transparency = 1 end
+            elseif v:IsA("BillboardGui") or v:IsA("SurfaceGui") then
+                v.Enabled = false
             end
         end
     end

@@ -700,7 +700,7 @@ indexClickArea.MouseButton1Click:Connect(function()
     repositionElements("Farm")
 end)
 
-local isAutoSpecific, SpecContainer, SpecSwitch = createOption("Auto Specific Brainrot", false, "Farm")
+local isAutoSpecific, SpecContainer, SpecSwitch = createOption("Auto Specific Brainrot [Click]", false, "Farm")
 
 local SpecificListContainer = Instance.new("Frame")
 SpecificListContainer.Size = UDim2.new(0.95, 0, 0, 400)

@@ -576,6 +576,7 @@ local isAutoLegendary = createOption("Auto Legendary", false, "Farm")
 local isAutoMystic = createOption("Auto Mystic", false, "Farm")
 local isAutoSecret = createOption("Auto Secret", false, "Farm")
 local isAutoStellar = createOption("Auto Stellar", false, "Farm")
+local isAutoDig = createOption("Auto Dig", false, "Farm")
 
 local isRebirthAutoActive = false
 local currentRebirthSelect = 0
@@ -1231,6 +1232,37 @@ task.spawn(function()
             if canSpin then
                 Bridge:FireServer("General", "SpinWheel", "Spin", false)
                 task.wait(5)
+            end
+        end
+    end
+end)
+
+task.spawn(function()
+    local Bridge = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Bridge")
+    
+    while task.wait(0.5) do
+        if isAutoDig() then
+            local character = Player.Character
+            local shovel = character and character:FindFirstChildOfClass("Tool")
+            
+            if shovel and string.find(shovel.Name, "Shovel") then
+                Bridge:FireServer("General", "Dig", "Start", 1.9174998539686197)
+                
+                task.wait(0.3)
+                
+                local diggingActive = true
+                while diggingActive and isAutoDig() do
+                    Bridge:FireServer("General", "Dig", "Click")
+                    
+                    local ui = PlayerGui:FindFirstChild("ProximityPrompts")
+                    local bar = ui and ui:FindFirstChild("CircularProgressBar", true)
+                    
+                    if not bar or not bar.IsVisible then
+                        diggingActive = false
+                    end
+                    
+                    task.wait(0.01)
+                end
             end
         end
     end

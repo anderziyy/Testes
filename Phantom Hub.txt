@@ -676,10 +676,6 @@ mutLayout.Padding = UDim.new(0, 5)
 mutLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 mutLayout.Parent = IndexMutContainer
 
-local mutPadding = Instance.new("UIPadding")
-mutPadding.PaddingTop = UDim.new(0, 5)
-mutPadding.Parent = IndexMutContainer
-
 local mutSelected = {Normal = true, Gold = true, Diamond = true, Rainbow = true, Galaxy = true, Lava = true}
 for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy", "Lava"}) do
     local btn = Instance.new("TextButton")

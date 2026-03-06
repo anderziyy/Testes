@@ -445,7 +445,7 @@ end)
 
 local isInstantBrainrot = createOption("Instant Collect Brainrots", false, "Main")
 
-local isAutoSell, SellContainer, SellSwitch = createOption("Auto Sell Brainrots", false, "Main")
+local isAutoSell, SellContainer, SellSwitch = createOption("Auto Sell Brainrots [Click]", false, "Main")
 
 local SellListContainer = Instance.new("Frame")
 SellListContainer.Size = UDim2.new(0.95, 0, 0, 400)

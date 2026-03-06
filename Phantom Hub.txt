@@ -556,6 +556,7 @@ local buyStar = createOption("Auto Star", false, "Buy")
 local buyFlow = createOption("Auto Flower", false, "Buy")
 local buyPhon = createOption("Auto Phone", false, "Buy")
 local buyTaco = createOption("Auto Taco", false, "Buy")
+local buyLighter = createOption("Auto Lighter", false, "Buy")
 local isAutoSpin = createOption("Auto Spin", false, "Buy")
 
 local isAntiAFK = createOption("Anti AFK", false, "Config")
@@ -1127,7 +1128,9 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-local function isAnyBuyActive() return buyIce() or buyVic() or buyStar() or buyFlow() or buyPhon() or buyTaco() end
+local function isAnyBuyActive() 
+    return buyIce() or buyVic() or buyStar() or buyFlow() or buyPhon() or buyTaco() or buyLighter() 
+end
 
 PlayerGui.Notification.DescendantAdded:Connect(function(descendant)
     if isAutoRebirth() or isAnyBuyActive() then
@@ -1135,7 +1138,9 @@ PlayerGui.Notification.DescendantAdded:Connect(function(descendant)
             RunService.RenderStepped:Wait()
             local text = ""
             pcall(function() text = descendant:IsA("TextLabel") and descendant.Text or descendant.Value.Text end)
-            if text:find("enough money") or text:find("necessary Brainrots") or isAnyBuyActive() then descendant:Destroy() end
+            if text:find("enough money") or text:find("necessary Brainrots") or text:find("not in stock") or isAnyBuyActive() then 
+                descendant:Destroy() 
+            end
         end
     end
 end)
@@ -1226,14 +1231,21 @@ local buyList = {
     {get = buyStar, name = "Star"}, 
     {get = buyFlow, name = "Flower"}, 
     {get = buyPhon, name = "Phone"},
-    {get = buyTaco, name = "Taco"}
+    {get = buyTaco, name = "Taco"},
+    {get = buyLighter, name = "Lighter"}
 }
 
 task.spawn(function()
     local Bridge = ReplicatedStorage:WaitForChild("Remotes", 5):WaitForChild("Bridge")
     while task.wait(1) do
         if isAnyBuyActive() then
-            pcall(function() for _, item in ipairs(buyList) do if item.get() then Bridge:FireServer("General", "Ingredients", "Purchase", item.name) end end end)
+            pcall(function() 
+                for _, item in ipairs(buyList) do 
+                    if item.get() then 
+                        Bridge:FireServer("General", "Ingredients", "Purchase", item.name) 
+                    end 
+                end 
+            end)
         end
     end
 end)

@@ -635,7 +635,7 @@ DropdownList.Parent = DropdownFrame
 DropdownList.SortOrder = Enum.SortOrder.LayoutOrder
 DropdownList.Padding = UDim.new(0, 2)
 
-for i = 1, 10 do
+for i = 1, 11 do
     local dropBtn = Instance.new("TextButton")
     dropBtn.Size = UDim2.new(1, 0, 0, 30)
     dropBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
@@ -933,7 +933,8 @@ local rebirthTargets = {
     [7] = {["Frigo Camelo"] = true, ["Tigroligre Frutonni"] = true},
     [8] = {["La Vacca Saturno Saturnita"] = true, ["Tralaledon"] = true},
     [9] = {["Matteo"] = true, ["Cavallo Virtuoso"] = true},
-    [10] = {["Tralalero Tralala"] = true, ["Chicleteira Bicicleteira"] = true}
+    [10] = {["Tralalero Tralala"] = true, ["Chicleteira Bicicleteira"] = true},
+    [11] = {["GraipussiMedussi"] = true, ["NuclearoDinosauro"] = true}
 }
 
 local function setVisibility(visible)

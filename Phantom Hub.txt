@@ -1001,7 +1001,8 @@ RunService.Heartbeat:Connect(function()
                 if tText:find("Gold") then currentMut = "Gold"
                 elseif tText:find("Diamond") then currentMut = "Diamond"
                 elseif tText:find("Rainbow") then currentMut = "Rainbow"
-                elseif tText:find("Galaxy") then currentMut = "Galaxy" end
+                elseif tText:find("Galaxy") then currentMut = "Galaxy"
+                elseif tText:find("Lava") then currentMut = "Lava" end
 
                 if autoIdx and mutSelected[currentMut] and titleText ~= "Lucky Block" and not checkIndex(titleText, currentMut) then 
                     isTarget = true

@@ -576,7 +576,7 @@ local isAutoLegendary = createOption("Auto Legendary", false, "Farm")
 local isAutoMystic = createOption("Auto Mystic", false, "Farm")
 local isAutoSecret = createOption("Auto Secret", false, "Farm")
 local isAutoStellar = createOption("Auto Stellar", false, "Farm")
-local isAutoDig = createOption("Auto Dig", false, "Farm")
+local isAutoDig = createOption("Auto Dig [Shovel]", false, "Farm")
 
 local isRebirthAutoActive = false
 local currentRebirthSelect = 0
@@ -1238,30 +1238,24 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-    local Bridge = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Bridge")
+    local Bridge = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Bridge")
     
-    while task.wait(0.5) do
+    while task.wait(0.1) do
         if isAutoDig() then
-            local character = Player.Character
-            local shovel = character and character:FindFirstChildOfClass("Tool")
+            local char = Player.Character
+            local shovel = char and char:FindFirstChildOfClass("Tool")
             
             if shovel and string.find(shovel.Name, "Shovel") then
-                Bridge:FireServer("General", "Dig", "Start", 1.9174998539686197)
+                local proximityGui = PlayerGui:FindFirstChild("ProximityPrompts")
+                local progressBar = proximityGui and proximityGui:FindFirstChild("CircularProgressBar", true)
                 
-                task.wait(0.3)
-                
-                local diggingActive = true
-                while diggingActive and isAutoDig() do
-                    Bridge:FireServer("General", "Dig", "Click")
-                    
-                    local ui = PlayerGui:FindFirstChild("ProximityPrompts")
-                    local bar = ui and ui:FindFirstChild("CircularProgressBar", true)
-                    
-                    if not bar or not bar.IsVisible then
-                        diggingActive = false
+                if not progressBar or not progressBar.Parent.Visible then
+                    Bridge:FireServer("General", "Dig", "Start", 1.9174998539686197)
+                    task.wait(0.2)
+                else
+                    for i = 1, 15 do
+                        Bridge:FireServer("General", "Dig", "Click")
                     end
-                    
-                    task.wait(0.01)
                 end
             end
         end

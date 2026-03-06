@@ -660,7 +660,7 @@ end)
 table.insert(options["Farm"], RebirthContainer)
 table.insert(options["Farm"], DropdownFrame)
 
-local isAutoIndex, IdxContainer, IdxSwitch = createOption("Auto Index Missing", false, "Farm")
+local isAutoIndex, IdxContainer, IdxSwitch = createOption("Auto Index Missing [Click]", false, "Farm")
 
 local IndexMutContainer = Instance.new("Frame")
 IndexMutContainer.Size = UDim2.new(0.95, 0, 0, 100)

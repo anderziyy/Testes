@@ -443,8 +443,6 @@ local isLowMode = createOption("Low Mode", false, "Main", function(active)
     end
 end)
 
-local isLurkySafe, LurkyContainer, LurkySwitch = createOption("Lurky Safe Zone", false, "Main")
-
 local isInstantBrainrot = createOption("Instant Collect Brainrots", false, "Main")
 
 local isAutoSell, SellContainer, SellSwitch = createOption("Auto Sell Brainrots [Click]", false, "Main")
@@ -1279,56 +1277,6 @@ task.spawn(function()
             end
         end
     end
-end)
-
-task.spawn(function()
-    local Player = game:GetService("Players").LocalPlayer
-    local RunService = game:GetService("RunService")
-    local targetCFrame = nil
-    local originalPos = nil
-
-    local function getMyBaseModel()
-        local serverBases = workspace:FindFirstChild("Server") and workspace.Server:FindFirstChild("Bases")
-        if serverBases then
-            for _, base in pairs(serverBases:GetChildren()) do
-                local owner = base:FindFirstChild("OwnerId")
-                if owner and tonumber(owner.Value) == Player.UserId then
-                    return base
-                end
-            end
-        end
-        return nil
-    end
-
-    RunService.Heartbeat:Connect(function()
-        if isLurkySafe() then
-            local char = Player.Character
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            if root then
-                if not targetCFrame then
-                    local myBase = getMyBaseModel()
-                    local collectZone = myBase and myBase:FindFirstChild("CollectZone")
-                    if collectZone then
-                        targetCFrame = collectZone.CFrame * CFrame.new(0, 0, 80)
-                    end
-                end
-                if targetCFrame then
-                    root.CFrame = targetCFrame
-                    root.Velocity = Vector3.new(0, 0, 0)
-                end
-            end
-        else
-            if targetCFrame then
-                targetCFrame = nil
-                local spawnLoc = workspace:FindFirstChild("SpawnLocation")
-                local char = Player.Character
-                local root = char and char:FindFirstChild("HumanoidRootPart")
-                if root and spawnLoc then
-                    root.CFrame = spawnLoc.CFrame + Vector3.new(0, 5, 0)
-                end
-            end
-        end
-    end)
 end)
 
 local buyList = {

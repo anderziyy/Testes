@@ -1088,7 +1088,7 @@ RunService.Heartbeat:Connect(function()
                 local rarityText = rarityLbl and string.lower(rarityLbl.Text) or ""
                 local titleText = titleLbl and titleLbl.Text or ""
                 
-                local currentMut = "Normal"
+                                local currentMut = "Normal"
                 local tText = typeLbl and typeLbl.Text or ""
                 if tText:find("Gold") then currentMut = "Gold"
                 elseif tText:find("Diamond") then currentMut = "Diamond"

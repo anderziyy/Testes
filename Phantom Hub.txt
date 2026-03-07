@@ -53,6 +53,9 @@ for _, brName in ipairs(sellBrainrots) do
     end
 end
 
+local hitboxSizeVal = 15
+local hitboxesExpanded = false
+
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PhantomHub_V1"
 ScreenGui.ResetOnSpawn = false
@@ -626,6 +629,12 @@ local isAutoSpin = createOption("Auto Spin", false, "Buy")
 local isAntiAFK = createOption("Anti AFK", false, "Config")
 local isAntiCheat = createOption("Anti Cheat", false, "Config")
 local isStaffDetector = createOption("Staff Detector", false, "Config")
+local isHitboxEnabled = createOption("Hitbox Expander", false, "Config")
+
+createSlider("Hitbox Size", 1, 100, 15, "Config", function(val)
+    hitboxSizeVal = val
+end)
+
 local isSpeedEnabled = createOption("Enable Speed", false, "Config")
 local customSpeedVal = 32
 createSlider("Speed", 1, 300, 32, "Config", function(val)
@@ -1124,6 +1133,34 @@ RunService.Heartbeat:Connect(function()
                     root.CFrame = head.CFrame
                     break
                 end
+            end
+        end
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if isHitboxEnabled() then
+        hitboxesExpanded = true
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = p.Character.HumanoidRootPart
+                hrp.Size = Vector3.new(hitboxSizeVal, hitboxSizeVal, hitboxSizeVal)
+                hrp.Transparency = 0.8
+                hrp.Color = Color3.fromRGB(255, 0, 0)
+                hrp.Material = Enum.Material.Neon
+                hrp.CanCollide = false
+            end
+        end
+    elseif hitboxesExpanded then
+        hitboxesExpanded = false
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = p.Character.HumanoidRootPart
+                hrp.Size = Vector3.new(2, 2, 1)
+                hrp.Transparency = 1
+                hrp.Color = Color3.fromRGB(163, 162, 165)
+                hrp.Material = Enum.Material.Plastic
+                hrp.CanCollide = true
             end
         end
     end

@@ -631,11 +631,10 @@ local isAntiCheat = createOption("Anti Cheat", false, "Config")
 local isStaffDetector = createOption("Staff Detector", false, "Config")
 local isSpeedEnabled = createOption("Enable Speed", false, "Config")
 local customSpeedVal = 32
+local isHitboxEnabled = createOption("Hitbox Expander", false, "Config")
 createSlider("Speed", 1, 300, 32, "Config", function(val)
     customSpeedVal = val
 end)
-local isHitboxEnabled = createOption("Hitbox Expander", false, "Cofig")
-
 createSlider("Hitbox Size", 1, 100, 15, "Main", function(val)
     hitboxSizeVal = val
 end)

@@ -416,6 +416,7 @@ local isLowMode = createOption("Low Mode", false, "Main", function(active)
         game.Lighting.GlobalShadows = false
         game.Lighting.Brightness = 2
         game.Lighting.FogEnd = 100000
+        settings().Rendering.QualityLevel = 1
         
         for _, v in pairs(workspace:GetDescendants()) do applyAgressiveLow(v) end
         for _, v in pairs(game.Lighting:GetChildren()) do applyAgressiveLow(v) end
@@ -426,6 +427,7 @@ local isLowMode = createOption("Low Mode", false, "Main", function(active)
         end)
     else
         if lowModeConn then lowModeConn:Disconnect() lowModeConn = nil end
+        settings().Rendering.QualityLevel = 0
         
         if originalSettings["Lighting"] then
             game.Lighting.GlobalShadows = originalSettings["Lighting"][1]
@@ -1056,14 +1058,32 @@ TabCredits.MouseButton1Click:Connect(function() showTab("Credits") end)
 local draggingBtn, dragStartBtn, startPosBtn
 FloatingButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        draggingBtn = true dragStartBtn = input.Position startPosBtn = FloatingButton.Position
+        draggingBtn = true 
+        dragStartBtn = input.Position 
+        startPosBtn = FloatingButton.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                draggingBtn = false
+            end
+        end)
     end
 end)
+
 UserInputService.InputChanged:Connect(function(input)
     if draggingBtn and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStartBtn
-        FloatingButton.Position = UDim2.new(startPosBtn.X.Scale, startPosBtn.X.Offset + delta.X, startPosBtn.Y.Scale, startPosBtn.Y.Offset + delta.Y)
+        FloatingButton.Position = UDim2.new(
+            startPosBtn.X.Scale, 
+            startPosBtn.X.Offset + delta.X, 
+            startPosBtn.Y.Scale, 
+            startPosBtn.Y.Offset + delta.Y
+        )
     end
+end)
+
+FloatingButton.MouseButton1Click:Connect(function() 
+    MainFrame.Visible = not MainFrame.Visible 
 end)
 UserInputService.InputEnded:Connect(function() draggingBtn = false end)
 FloatingButton.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
@@ -1073,8 +1093,15 @@ repositionElements("Main")
 
 Player.Idled:Connect(function()
     if isAntiAFK() then
-        VirtualUser:CaptureController()
-        VirtualUser:ClickButton2(Vector2.new())
+        pcall(function()
+            VirtualUser:CaptureController()
+            VirtualUser:ClickButton2(Vector2.new())
+        end)
+        pcall(function()
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.RightShift, false, game)
+            task.wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.RightShift, false, game)
+        end)
     end
 end)
 
@@ -1323,26 +1350,31 @@ end)
 
 task.spawn(function()
     local blackListNames = {["SellPrompt"] = true, ["GrabPrompt"] = true, ["PlacePrompt"] = true, ["AddPrompt"] = true, ["DeleteAllPrompt"] = true, ["DeletePrompt"] = true, ["StealPrompt"] = true, ["GiftPrompt"] = true, ["OpenPrompt"] = true}
+    local firePrompt = fireproximityprompt or (function(p) pcall(function() p:InputHoldBegin() task.wait() p:InputHoldEnd() end) end)
 
     while task.wait(0.1) do
         local buyAny = isAutoBuyBrainrot()
         if buyAny or targetHead then
             pcall(function()
                 local char = Player.Character
-                if char and char:FindFirstChild("HumanoidRootPart") then
-                    local root = char.HumanoidRootPart
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                if root then
                     for _, prompt in pairs(workspace:GetDescendants()) do
                         if prompt:IsA("ProximityPrompt") and prompt.Enabled then
                             if not blackListNames[prompt.Name] then
                                 local part = prompt.Parent
-                                local model = part and part:FindFirstAncestorOfClass("Model")
-                                local isMerchant = model and (model.Name == "IngredientsMerchant" or model.Name == "RobuxMerchant")
-                                if part and part:IsA("BasePart") and not isMerchant then
-                                    if (root.Position - part.Position).Magnitude <= prompt.MaxActivationDistance then
-                                        if buyAny then
-                                            fireproximityprompt(prompt)
-                                        elseif targetHead and prompt.Parent.Parent == targetHead.Parent then
-                                            fireproximityprompt(prompt)
+                                if part and part:IsA("BasePart") then
+                                    local model = part:FindFirstAncestorOfClass("Model")
+                                    local isMerchant = model and (model.Name == "IngredientsMerchant" or model.Name == "RobuxMerchant")
+                                    
+                                    if not isMerchant then
+                                        local dist = (root.Position - part.Position).Magnitude
+                                        if dist <= (prompt.MaxActivationDistance + 2) then
+                                            if buyAny then
+                                                firePrompt(prompt)
+                                            elseif targetHead and prompt:IsDescendantOf(targetHead.Parent) then
+                                                firePrompt(prompt)
+                                            end
                                         end
                                     end
                                 end

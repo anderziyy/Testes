@@ -465,7 +465,7 @@ local isLuckyBlockSafe = createOption("Lucky Block Safe Farm", false, "Main", fu
     if not tpPart then return end
 
     if active then
-        local safeCFrame = tpPart.CFrame * CFrame.new(0, 0, 300)
+        local safeCFrame = tpPart.CFrame * CFrame.new(0, 300, 0)
         root.CFrame = safeCFrame
         
         task.spawn(function()

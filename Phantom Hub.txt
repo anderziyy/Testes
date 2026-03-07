@@ -45,11 +45,10 @@ for _, brName in ipairs(sellBrainrots) do
     else
         sellTargets[brName] = {
             Active = false, 
-            Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Lava=true}
+            Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}
         }
     end
 end
-
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PhantomHub_V1"
@@ -577,7 +576,7 @@ for _, brName in ipairs(sellBrainrots) do
     smLayout.CellSize = UDim2.new(0, 55, 0, 25)
     smLayout.Parent = mutsFrame
 
-    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Lava"}) do
+    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy"}) do
         local mBtn = Instance.new("TextButton")
         mBtn.BackgroundColor3 = sellTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
         mBtn.Text = m:sub(1,3)
@@ -823,7 +822,7 @@ for _, brName in ipairs(allBrainrots) do
     if savedSpecific[brName] then
         specificTargets[brName] = savedSpecific[brName]
     else
-        specificTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Lava=true}}
+        specificTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}}
     end
     
     local itemFrame = Instance.new("Frame")
@@ -861,7 +860,7 @@ for _, brName in ipairs(allBrainrots) do
     smLayout.CellSize = UDim2.new(0, 50, 0, 25)
     smLayout.Parent = mutsFrame
 
-    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Lava"}) do
+    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy"}) do
         local mBtn = Instance.new("TextButton")
         mBtn.BackgroundColor3 = specificTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
         mBtn.Text = m:sub(1,3)

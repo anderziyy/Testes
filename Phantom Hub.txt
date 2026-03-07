@@ -1190,8 +1190,8 @@ RunService.Heartbeat:Connect(function()
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not root then return end
 
-    local bestTarget = nil
-    local highestPriority = 0
+    local bestHead = nil
+    local bestPriority = -1
 
     for _, model in pairs(brainrotsFolder:GetChildren()) do
         if model:IsA("Model") then
@@ -1205,7 +1205,7 @@ RunService.Heartbeat:Connect(function()
             if head and frame then
                 local rarityText = rarityLbl and string.lower(rarityLbl.Text) or ""
                 local titleText = titleLbl and titleLbl.Text or ""
-                local currentPriority = 0
+                local currentPriority = -1
                 
                 local currentMut = "Normal"
                 local tText = typeLbl and typeLbl.Text or ""
@@ -1214,34 +1214,36 @@ RunService.Heartbeat:Connect(function()
                 elseif tText:find("Rainbow") then currentMut = "Rainbow"
                 elseif tText:find("Lava") then currentMut = "Lava" end
 
-                if autoIdx and mutSelected[currentMut] and titleText ~= "Lucky Block" and not checkIndex(titleText, currentMut) then 
-                    currentPriority = 7
-                elseif autoSpec and specificTargets[titleText] and specificTargets[titleText].Active and specificTargets[titleText].Muts[currentMut] then 
+                if autoSpec and specificTargets[titleText] and specificTargets[titleText].Active and specificTargets[titleText].Muts[currentMut] then
                     currentPriority = 6
-                elseif autoStellar and (rarityText:find("stellar") or stellarNames[titleText]) then 
+                elseif autoStellar and (rarityText:find("stellar") or stellarNames[titleText]) then
                     currentPriority = 5
-                elseif autoSecret and (rarityText:find("secret") or secretNames[titleText]) then 
+                elseif autoSecret and (rarityText:find("secret") or secretNames[titleText]) then
                     currentPriority = 4
-                elseif autoMystic and (rarityText:find("mythic") or mythicNames[titleText]) then 
+                elseif autoMystic and (rarityText:find("mythic") or mythicNames[titleText]) then
                     currentPriority = 3
-                elseif autoLegendary and (rarityText:find("legendary") or legendaryNames[titleText]) then 
+                elseif autoLegendary and (rarityText:find("legendary") or legendaryNames[titleText]) then
                     currentPriority = 2
-                elseif autoEpic and (rarityText:find("epic") or epicNames[titleText]) then 
+                elseif autoEpic and (rarityText:find("epic") or epicNames[titleText]) then
                     currentPriority = 1
-                elseif rActive and rebirthTargets[currentRebirthSelect] and rebirthTargets[currentRebirthSelect][titleText] then 
-                    currentPriority = 1
+                elseif rActive and rebirthTargets[currentRebirthSelect] and rebirthTargets[currentRebirthSelect][titleText] then
+                    currentPriority = 0.5
+                elseif autoIdx and mutSelected[currentMut] and titleText ~= "Lucky Block" and not checkIndex(titleText, currentMut) then
+                    currentPriority = 0
                 end
 
-                if currentPriority > highestPriority then
-                    highestPriority = currentPriority
-                    bestTarget = head
+                if currentPriority > bestPriority then
+                    bestPriority = currentPriority
+                    bestHead = head
+                elseif currentPriority == bestPriority and targetHead and targetHead.Parent == model then
+                    bestHead = head
                 end
             end
         end
     end
 
-    if bestTarget then
-        targetHead = bestTarget
+    if bestHead then
+        targetHead = bestHead
         root.CFrame = targetHead.CFrame
         if not isHidden then setVisibility(false) end
     else

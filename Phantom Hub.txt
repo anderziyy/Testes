@@ -615,12 +615,6 @@ for _, brName in ipairs(sellBrainrots) do
 end
 sellScroll.CanvasSize = UDim2.new(0, 0, 0, ySellSize)
 
-local isHitboxEnabled = createOption("Hitbox Expander", false, "Main")
-
-createSlider("Hitbox Size", 1, 100, 15, "Main", function(val)
-    hitboxSizeVal = val
-end)
-
 local isGodRagdoll = createOption("Anti Ragdoll", true, "Main")
 
 local buyIce = createOption("Auto Ice Emblem", false, "Buy")
@@ -639,6 +633,11 @@ local isSpeedEnabled = createOption("Enable Speed", false, "Config")
 local customSpeedVal = 32
 createSlider("Speed", 1, 300, 32, "Config", function(val)
     customSpeedVal = val
+end)
+local isHitboxEnabled = createOption("Hitbox Expander", false, "Cofig")
+
+createSlider("Hitbox Size", 1, 100, 15, "Main", function(val)
+    hitboxSizeVal = val
 end)
 
 createInfoBox("By: Cleiton10HDx", "Script created by this user.", "Credits", false)

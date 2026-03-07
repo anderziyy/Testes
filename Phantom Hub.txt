@@ -633,7 +633,8 @@ local isStaffDetector = createOption("Staff Detector", false, "Config")
 local isHitboxEnabled = createOption("Hitbox Expander", false, "Config")
 
 createSlider("Hitbox Size", 1, 100, 15, "Config", function(val)
-    hitboxSizeVal = val)
+    hitboxSizeVal = val
+end)
 
 local isSpeedEnabled = createOption("Enable Speed", false, "Config")
 local customSpeedVal = 32

@@ -1190,14 +1190,8 @@ RunService.Heartbeat:Connect(function()
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not root then return end
 
-    if targetHead and targetHead.Parent and targetHead.Parent.Parent == brainrotsFolder then
-        root.CFrame = targetHead.CFrame
-        if not isHidden then setVisibility(false) end
-        return
-    end
-
-    targetHead = nil
-    if isHidden then setVisibility(true) end
+    local bestTarget = nil
+    local highestPriority = 0
 
     for _, model in pairs(brainrotsFolder:GetChildren()) do
         if model:IsA("Model") then
@@ -1209,9 +1203,9 @@ RunService.Heartbeat:Connect(function()
             local head = model:FindFirstChild("Head")
 
             if head and frame then
-                local isTarget = false
                 local rarityText = rarityLbl and string.lower(rarityLbl.Text) or ""
                 local titleText = titleLbl and titleLbl.Text or ""
+                local currentPriority = 0
                 
                 local currentMut = "Normal"
                 local tText = typeLbl and typeLbl.Text or ""
@@ -1221,30 +1215,38 @@ RunService.Heartbeat:Connect(function()
                 elseif tText:find("Lava") then currentMut = "Lava" end
 
                 if autoIdx and mutSelected[currentMut] and titleText ~= "Lucky Block" and not checkIndex(titleText, currentMut) then 
-                    isTarget = true
+                    currentPriority = 7
                 elseif autoSpec and specificTargets[titleText] and specificTargets[titleText].Active and specificTargets[titleText].Muts[currentMut] then 
-                    isTarget = true
-                elseif autoEpic and (rarityText:find("epic") or epicNames[titleText]) then 
-                    isTarget = true
-                elseif autoLegendary and (rarityText:find("legendary") or legendaryNames[titleText]) then 
-                    isTarget = true
-                elseif autoMystic and (rarityText:find("mythic") or mythicNames[titleText]) then 
-                    isTarget = true
-                elseif autoSecret and (rarityText:find("secret") or secretNames[titleText]) then 
-                    isTarget = true
+                    currentPriority = 6
                 elseif autoStellar and (rarityText:find("stellar") or stellarNames[titleText]) then 
-                    isTarget = true
+                    currentPriority = 5
+                elseif autoSecret and (rarityText:find("secret") or secretNames[titleText]) then 
+                    currentPriority = 4
+                elseif autoMystic and (rarityText:find("mythic") or mythicNames[titleText]) then 
+                    currentPriority = 3
+                elseif autoLegendary and (rarityText:find("legendary") or legendaryNames[titleText]) then 
+                    currentPriority = 2
+                elseif autoEpic and (rarityText:find("epic") or epicNames[titleText]) then 
+                    currentPriority = 1
                 elseif rActive and rebirthTargets[currentRebirthSelect] and rebirthTargets[currentRebirthSelect][titleText] then 
-                    isTarget = true
+                    currentPriority = 1
                 end
 
-                if isTarget then
-                    targetHead = head
-                    root.CFrame = head.CFrame
-                    break
+                if currentPriority > highestPriority then
+                    highestPriority = currentPriority
+                    bestTarget = head
                 end
             end
         end
+    end
+
+    if bestTarget then
+        targetHead = bestTarget
+        root.CFrame = targetHead.CFrame
+        if not isHidden then setVisibility(false) end
+    else
+        targetHead = nil
+        if isHidden then setVisibility(true) end
     end
 end)
 

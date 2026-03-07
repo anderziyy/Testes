@@ -1156,7 +1156,17 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-    local blackListNames = {["SellPrompt"] = true, ["GrabPrompt"] = true, ["PlacePrompt"] = true, ["AddPrompt"] = true}
+    local blackListNames = {
+        ["SellPrompt"] = true, 
+        ["GrabPrompt"] = true, 
+        ["PlacePrompt"] = true, 
+        ["AddPrompt"] = true,
+        ["DeleteAllPrompt"] = true,
+        ["DeletePrompt"] = true,
+        ["StealPrompt"] = true,
+        ["GiftPrompt"] = true
+        ["OpenPrompt"] = true
+    }
     while task.wait(0.1) do
         local buyAny = isAutoBuyBrainrot()
         if buyAny or targetHead then

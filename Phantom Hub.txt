@@ -443,62 +443,43 @@ local isLowMode = createOption("Low Mode", false, "Main", function(active)
     end
 end)
 
-local isLuckySafeFarm = createOption("Lucky Safe Farm", false, "Main", function(active)
+local isLuckyBlockSafe = createOption("Lucky Block Safe Farm", false, "Main", function(active)
     local char = Player.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not root then return end
 
-    local function getMyBase()
+    local function getMyBaseTeleport()
         local serverBases = workspace:FindFirstChild("Server") and workspace.Server:FindFirstChild("Bases")
         if serverBases then
-            for _, baseModel in pairs(serverBases:GetChildren()) do
-                local owner = baseModel:FindFirstChild("OwnerId")
-                if owner and (tostring(owner.Value) == tostring(Player.UserId)) then
-                    return baseModel
+            for _, base in pairs(serverBases:GetChildren()) do
+                local owner = base:FindFirstChild("OwnerId")
+                if owner and tostring(owner.Value) == tostring(Player.UserId) then
+                    return base:FindFirstChild("Teleport")
                 end
             end
         end
         return nil
     end
 
+    local tpPart = getMyBaseTeleport()
+    if not tpPart then return end
+
     if active then
-        local myBase = getMyBase()
-        local tpPart = myBase and myBase:FindFirstChild("Teleport")
-        if tpPart then
-            local targetPos = tpPart.CFrame * CFrame.new(0, 0, 300)
-            
-            if not workspace:FindFirstChild("SafePlatform") then
-                local plat = Instance.new("Part")
-                plat.Name = "SafePlatform"
-                plat.Size = Vector2.new(10, 1, 10)
-                plat.CFrame = targetPos * CFrame.new(0, -3.5, 0)
-                plat.Anchored = true
-                plat.Transparency = 1
-                plat.Parent = workspace
-            end
-            
-            root.CFrame = targetPos
-            
-            task.spawn(function()
-                while isLuckySafeFarm() do
-                    if root and root.Parent then
-                        root.Velocity = Vector3.new(0, 0, 0)
-                        root.RotVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = targetPos
-                    end
-                    task.wait()
-                end
-            end)
-        end
-    else
-        local plat = workspace:FindFirstChild("SafePlatform")
-        if plat then plat:Destroy() end
+        local safeCFrame = tpPart.CFrame * CFrame.new(0, 0, 300)
+        root.CFrame = safeCFrame
         
-        local myBase = getMyBase()
-        local tpPart = myBase and myBase:FindFirstChild("Teleport")
-        if tpPart then
-            root.CFrame = tpPart.CFrame
-        end
+        task.spawn(function()
+            while isLuckyBlockSafe() do
+                root.CFrame = safeCFrame
+                root.Velocity = Vector3.new(0, 0, 0)
+                root.Anchored = true
+                task.wait()
+            end
+            root.Anchored = false
+        end)
+    else
+        root.Anchored = false
+        root.CFrame = tpPart.CFrame
     end
 end)
 

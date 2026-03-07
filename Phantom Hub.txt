@@ -742,8 +742,8 @@ local mutPadding = Instance.new("UIPadding")
 mutPadding.PaddingTop = UDim.new(0, 5)
 mutPadding.Parent = IndexMutContainer
 
-local mutSelected = {Normal = true, Gold = true, Diamond = true, Rainbow = true, Galaxy = true, Lava = true}
-for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy", "Lava"}) do
+local mutSelected = {Normal = true, Gold = true, Diamond = true, Rainbow = true, Lava = true}
+for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Lava"}) do
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0.9, 0, 0, 28)
     btn.BackgroundColor3 = mutSelected[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
@@ -1093,7 +1093,6 @@ RunService.Heartbeat:Connect(function()
                 if tText:find("Gold") then currentMut = "Gold"
                 elseif tText:find("Diamond") then currentMut = "Diamond"
                 elseif tText:find("Rainbow") then currentMut = "Rainbow"
-                elseif tText:find("Galaxy") then currentMut = "Galaxy"
                 elseif tText:find("Lava") then currentMut = "Lava" end
 
                 if autoIdx and mutSelected[currentMut] and titleText ~= "Lucky Block" and not checkIndex(titleText, currentMut) then 

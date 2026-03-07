@@ -736,6 +736,7 @@ local buyTaco = createOption("Auto Taco", false, "Buy")
 local buyLighter = createOption("Auto Lighter", false, "Buy")
 local isAutoSpin = createOption("Auto Spin", false, "Buy")
 
+local isAutoBat = createOption("Auto Bat", false, "Config")
 local isInfiniteJump = createOption("Infinite Jump", false, "Config")
 
 UserInputService.JumpRequest:Connect(function()
@@ -753,7 +754,6 @@ end)
 local isAntiAFK = createOption("Anti AFK", false, "Config")
 local isAntiCheat = createOption("Anti Cheat", false, "Config")
 local isStaffDetector = createOption("Staff Detector", false, "Config")
-local isAutoBat = createOption("Auto Bat / Hammer", false, "Config")
 local isHitboxEnabled = createOption("Hitbox Expander", false, "Config")
 
 createSlider("Hitbox Size", 1, 100, 15, "Config", function(val)

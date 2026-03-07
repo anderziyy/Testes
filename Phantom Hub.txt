@@ -736,6 +736,20 @@ local buyTaco = createOption("Auto Taco", false, "Buy")
 local buyLighter = createOption("Auto Lighter", false, "Buy")
 local isAutoSpin = createOption("Auto Spin", false, "Buy")
 
+local isInfiniteJump = createOption("Infinite Jump", false, "Config")
+
+UserInputService.JumpRequest:Connect(function()
+    if isInfiniteJump() then
+        local character = Player.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end
+    end
+end)
+
 local isAntiAFK = createOption("Anti AFK", false, "Config")
 local isAntiCheat = createOption("Anti Cheat", false, "Config")
 local isStaffDetector = createOption("Staff Detector", false, "Config")

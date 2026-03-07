@@ -42,9 +42,6 @@ local savedSell = savedSettings["SellTargets"] or {}
 for _, brName in ipairs(sellBrainrots) do
     if savedSell[brName] then
         sellTargets[brName] = savedSell[brName]
-        if sellTargets[brName].Muts.Lava == nil then
-            sellTargets[brName].Muts.Lava = true
-        end
     else
         sellTargets[brName] = {
             Active = false, 

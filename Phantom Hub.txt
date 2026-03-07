@@ -53,6 +53,9 @@ for _, brName in ipairs(sellBrainrots) do
     end
 end
 
+local hitboxSizeVal = 15
+local hitboxesExpanded = false
+
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PhantomHub_V1"
 ScreenGui.ResetOnSpawn = false
@@ -611,6 +614,12 @@ for _, brName in ipairs(sellBrainrots) do
     end)
 end
 sellScroll.CanvasSize = UDim2.new(0, 0, 0, ySellSize)
+
+local isHitboxEnabled = createOption("Hitbox Expander", false, "Main")
+
+createSlider("Hitbox Size", 1, 100, 15, "Main", function(val)
+    hitboxSizeVal = val
+end)
 
 local isGodRagdoll = createOption("Anti Ragdoll", true, "Main")
 
@@ -1360,6 +1369,31 @@ task.spawn(function()
                         task.wait(0.1)
                     end
                 end
+            end
+        end
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if isHitboxEnabled() then
+        hitboxesExpanded = true
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = p.Character.HumanoidRootPart
+                hrp.Size = Vector3.new(hitboxSizeVal, hitboxSizeVal, hitboxSizeVal)
+                hrp.Transparency = 0.7
+                hrp.Color = Color3.fromRGB(255, 0, 0)
+                hrp.CanCollide = false
+            end
+        end
+    elseif hitboxesExpanded then
+        hitboxesExpanded = false
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = p.Character.HumanoidRootPart
+                hrp.Size = Vector3.new(2, 2, 1)
+                hrp.Transparency = 1
+                hrp.CanCollide = true
             end
         end
     end

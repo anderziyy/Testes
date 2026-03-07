@@ -42,6 +42,9 @@ local savedSell = savedSettings["SellTargets"] or {}
 for _, brName in ipairs(sellBrainrots) do
     if savedSell[brName] then
         sellTargets[brName] = savedSell[brName]
+        if sellTargets[brName].Muts.Lava == nil then
+            sellTargets[brName].Muts.Lava = true
+        end
     else
         sellTargets[brName] = {
             Active = false, 
@@ -49,7 +52,6 @@ for _, brName in ipairs(sellBrainrots) do
         }
     end
 end
-
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PhantomHub_V1"
@@ -578,21 +580,21 @@ for _, brName in ipairs(sellBrainrots) do
     smLayout.Parent = mutsFrame
 
     for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Lava"}) do
-        local mBtn = Instance.new("TextButton")
-        mBtn.BackgroundColor3 = sellTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
-        mBtn.Text = m:sub(1,3)
-        mBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        mBtn.TextSize = 11
-        mBtn.Parent = mutsFrame
-        Instance.new("UICorner", mBtn)
+    local mBtn = Instance.new("TextButton")
+    mBtn.BackgroundColor3 = sellTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
+    mBtn.Text = m:sub(1,3)
+    mBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    mBtn.TextSize = 11
+    mBtn.Parent = mutsFrame
+    Instance.new("UICorner", mBtn)
 
-        mBtn.MouseButton1Click:Connect(function()
-            sellTargets[brName].Muts[m] = not sellTargets[brName].Muts[m]
-            mBtn.BackgroundColor3 = sellTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
-            savedSettings["SellTargets"] = sellTargets
-            saveSettings()
-        end)
-    end
+    mBtn.MouseButton1Click:Connect(function()
+        sellTargets[brName].Muts[m] = not sellTargets[brName].Muts[m]
+        mBtn.BackgroundColor3 = sellTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
+        savedSettings["SellTargets"] = sellTargets
+        saveSettings()
+    end)
+end
 
     nameBtn.MouseButton1Click:Connect(function()
         mutsFrame.Visible = not mutsFrame.Visible
@@ -822,9 +824,16 @@ local ySpecSize = 0
 for _, brName in ipairs(allBrainrots) do
     if savedSpecific[brName] then
         specificTargets[brName] = savedSpecific[brName]
+        if specificTargets[brName].Muts.Lava == nil then
+            specificTargets[brName].Muts.Lava = true
+        end
     else
-        specificTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Lava=true}}
+        specificTargets[brName] = {
+            Active = false, 
+            Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Lava=true}
+        }
     end
+end
     
     local itemFrame = Instance.new("Frame")
     itemFrame.Size = UDim2.new(1, 0, 0, 35)
@@ -862,21 +871,21 @@ for _, brName in ipairs(allBrainrots) do
     smLayout.Parent = mutsFrame
 
     for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Lava"}) do
-        local mBtn = Instance.new("TextButton")
+    local mBtn = Instance.new("TextButton")
+    mBtn.BackgroundColor3 = specificTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
+    mBtn.Text = m:sub(1,3)
+    mBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    mBtn.TextSize = 12
+    mBtn.Parent = mutsFrame
+    Instance.new("UICorner", mBtn)
+    
+    mBtn.MouseButton1Click:Connect(function()
+        specificTargets[brName].Muts[m] = not specificTargets[brName].Muts[m]
         mBtn.BackgroundColor3 = specificTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
-        mBtn.Text = m:sub(1,3)
-        mBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        mBtn.TextSize = 12
-        mBtn.Parent = mutsFrame
-        Instance.new("UICorner", mBtn)
-        
-        mBtn.MouseButton1Click:Connect(function()
-            specificTargets[brName].Muts[m] = not specificTargets[brName].Muts[m]
-            mBtn.BackgroundColor3 = specificTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
-            savedSettings["SpecificTargets"] = specificTargets
-            saveSettings()
-        end)
-    end
+        savedSettings["SpecificTargets"] = specificTargets
+        saveSettings()
+    end)
+end
 
     nameBtn.MouseButton1Click:Connect(function()
         mutsFrame.Visible = not mutsFrame.Visible

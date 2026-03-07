@@ -512,17 +512,57 @@ end)
 
 local isInstantBrainrot = createOption("Instant Collect Brainrots", false, "Main")
 
+local function parseEarnValue(text)
+    if not text then return 0 end
+    local clean = text:gsub("[%$%/s%, ]", "")
+    local suffix = clean:sub(-1):upper()
+    local number = tonumber(clean:sub(1, -2)) or tonumber(clean)
+    
+    if not number then return 0 end
+    if suffix == "K" then return number * 1000
+    elseif suffix == "M" then return number * 1000000
+    elseif suffix == "B" then return number * 1000000000
+    elseif suffix == "T" then return number * 1000000000000
+    end
+    return tonumber(clean) or 0
+end
+
+local function formatValue(val)
+    if val >= 1e12 then return string.format("%.1fT", val/1e12)
+    elseif val >= 1e9 then return string.format("%.1fB", val/1e9)
+    elseif val >= 1e6 then return string.format("%.1fM", val/1e6)
+    elseif val >= 1e3 then return string.format("%.1fK", val/1e3)
+    end
+    return tostring(val)
+end
+
+local minEarnValue = savedSettings["MinEarnSell"] or 0
+local tempValue = 0
+
 local isAutoSell, SellContainer, SellSwitch = createOption("Auto Sell Brainrots [Click]", false, "Main")
 
 local SellListContainer = Instance.new("Frame")
-SellListContainer.Size = UDim2.new(0.95, 0, 0, 400)
+SellListContainer.Size = UDim2.new(0.95, 0, 0, 450)
 SellListContainer.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 SellListContainer.Visible = false
 SellListContainer.Parent = MainContent
 Instance.new("UICorner", SellListContainer).CornerRadius = UDim.new(0, 10)
 
+local searchBar = Instance.new("TextBox")
+searchBar.Size = UDim2.new(0.9, 0, 0, 30)
+searchBar.Position = UDim2.new(0.05, 0, 0, 10)
+searchBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+searchBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchBar.PlaceholderText = "Min Earn to Sell (Ex: 1M, 500K, 10B)"
+searchBar.Text = minEarnValue > 0 and formatValue(minEarnValue) or ""
+searchBar.Font = Enum.Font.SourceSans
+searchBar.TextSize = 16
+searchBar.Parent = SellListContainer
+Instance.new("UICorner", searchBar).CornerRadius = UDim.new(0, 6)
+
 local sellScroll = Instance.new("ScrollingFrame")
-sellScroll.Size = UDim2.new(1, 0, 1, 0)
+sellScroll.Size = UDim2.new(1, 0, 1, -50)
+sellScroll.Position = UDim2.new(0, 0, 0, 50)
 sellScroll.BackgroundTransparency = 1
 sellScroll.ScrollBarThickness = 2
 sellScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -531,6 +571,76 @@ sellScroll.Parent = SellListContainer
 local sellLayout = Instance.new("UIListLayout")
 sellLayout.SortOrder = Enum.SortOrder.LayoutOrder
 sellLayout.Parent = sellScroll
+
+local ConfirmFrame = Instance.new("Frame")
+ConfirmFrame.Size = UDim2.new(0.8, 0, 0, 150)
+ConfirmFrame.Position = UDim2.new(0.1, 0, 0.3, 0)
+ConfirmFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ConfirmFrame.Visible = false
+ConfirmFrame.ZIndex = 10
+ConfirmFrame.Parent = MainFrame
+
+local CFCorner = Instance.new("UICorner", ConfirmFrame)
+local CFStroke = Instance.new("UIStroke", ConfirmFrame)
+CFStroke.Color = Color3.fromRGB(255, 255, 255)
+CFStroke.Thickness = 2
+
+local CFText = Instance.new("TextLabel")
+CFText.Size = UDim2.new(0.9, 0, 0.4, 0)
+CFText.Position = UDim2.new(0.05, 0, 0.1, 0)
+CFText.BackgroundTransparency = 1
+CFText.Text = "Are you sure you want to redefine the amount of money per second?"
+CFText.TextColor3 = Color3.fromRGB(255, 255, 255)
+CFText.Font = Enum.Font.SourceSansBold
+CFText.TextSize = 16
+CFText.TextWrapped = true
+CFText.ZIndex = 11
+CFText.Parent = ConfirmFrame
+
+local ConfirmBtn = Instance.new("TextButton")
+ConfirmBtn.Size = UDim2.new(0.4, 0, 0, 35)
+ConfirmBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+ConfirmBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+ConfirmBtn.Text = "Confirm"
+ConfirmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ConfirmBtn.Font = Enum.Font.SourceSansBold
+ConfirmBtn.ZIndex = 11
+ConfirmBtn.Parent = ConfirmFrame
+Instance.new("UICorner", ConfirmBtn)
+
+local CancelBtn = Instance.new("TextButton")
+CancelBtn.Size = UDim2.new(0.4, 0, 0, 35)
+CancelBtn.Position = UDim2.new(0.55, 0, 0.65, 0)
+CancelBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+CancelBtn.Text = "Cancel"
+CancelBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CancelBtn.Font = Enum.Font.SourceSansBold
+CancelBtn.ZIndex = 11
+CancelBtn.Parent = ConfirmFrame
+Instance.new("UICorner", CancelBtn)
+
+searchBar.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        tempValue = parseEarnValue(searchBar.Text)
+        InnerFrame.Visible = false
+        ConfirmFrame.Visible = true
+    end
+end)
+
+ConfirmBtn.MouseButton1Click:Connect(function()
+    minEarnValue = tempValue
+    savedSettings["MinEarnSell"] = minEarnValue
+    saveSettings()
+    searchBar.Text = formatValue(minEarnValue)
+    ConfirmFrame.Visible = false
+    InnerFrame.Visible = true
+end)
+
+CancelBtn.MouseButton1Click:Connect(function()
+    searchBar.Text = minEarnValue > 0 and formatValue(minEarnValue) or ""
+    ConfirmFrame.Visible = false
+    InnerFrame.Visible = true
+end)
 
 local sellClickArea = Instance.new("TextButton")
 sellClickArea.Size = UDim2.new(0.6, 0, 1, 0)
@@ -1312,12 +1422,14 @@ task.spawn(function()
                         if uiFrame then
                             local brNameLabel = uiFrame:FindFirstChild("Title")
                             local brTypeLabel = uiFrame:FindFirstChild("Type")
+                            local brEarnLabel = uiFrame:FindFirstChild("Earn")
                             
-                            if brNameLabel then
+                            if brNameLabel and brEarnLabel then
                                 local brName = brNameLabel.Text
+                                local currentEarn = parseEarnValue(brEarnLabel.Text)
                                 local config = sellTargets[brName]
                                 
-                                if config and config.Active then
+                                if config and config.Active and (currentEarn < minEarnValue) then
                                     local mutType = (brTypeLabel.Text == "" or brTypeLabel.Text == nil) and "Normal" or brTypeLabel.Text
                                     if config.Muts[mutType] then
                                         Bridge:FireServer("General", "Brainrots", "Sell", slotModel.Name)

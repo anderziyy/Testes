@@ -53,10 +53,6 @@ for _, brName in ipairs(sellBrainrots) do
     end
 end
 
-local hitboxSizeVal = 15
-local hitboxesExpanded = false
-
-
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PhantomHub_V1"
 ScreenGui.ResetOnSpawn = false
@@ -630,12 +626,6 @@ local isAutoSpin = createOption("Auto Spin", false, "Buy")
 local isAntiAFK = createOption("Anti AFK", false, "Config")
 local isAntiCheat = createOption("Anti Cheat", false, "Config")
 local isStaffDetector = createOption("Staff Detector", false, "Config")
-local isHitboxEnabled = createOption("Hitbox Expander", false, "Config")
-
-createSlider("Hitbox Size", 1, 100, 15, "Config", function(val)
-    hitboxSizeVal = val
-end)
-
 local isSpeedEnabled = createOption("Enable Speed", false, "Config")
 local customSpeedVal = 32
 createSlider("Speed", 1, 300, 32, "Config", function(val)
@@ -1370,57 +1360,6 @@ task.spawn(function()
                         task.wait(0.1)
                     end
                 end
-            end
-        end
-    end
-end)
-
-local oldInvokeServer
-oldInvokeServer = hookmetamethod(game, "__namecall", function(self, ...)
-    local method = getnamecallmethod()
-    local args = {...}
-    if method == "InvokeServer" and tostring(self) == "Attack" and args[1] == "Bat" and isHitboxEnabled() then
-        local targets = args[2] or {}
-        local char = Player.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        if root then
-            for _, p in pairs(game.Players:GetPlayers()) do
-                if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                    local dist = (root.Position - p.Character.HumanoidRootPart.Position).Magnitude
-                    if dist <= hitboxSizeVal then
-                        local found = false
-                        for _, t in ipairs(targets) do if t == p.Character then found = true break end end
-                        if not found then table.insert(targets, p.Character) end
-                    end
-                end
-            end
-        end
-        args[2] = targets
-        return oldInvokeServer(self, unpack(args))
-    end
-    return oldInvokeServer(self, ...)
-end)
-
-RunService.Heartbeat:Connect(function()
-    if isHitboxEnabled() then
-        hitboxesExpanded = true
-        for _, p in pairs(game.Players:GetPlayers()) do
-            if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                local hrp = p.Character.HumanoidRootPart
-                hrp.Size = Vector3.new(hitboxSizeVal, hitboxSizeVal, hitboxSizeVal)
-                hrp.Transparency = 0.7
-                hrp.Color = Color3.fromRGB(255, 0, 0)
-                hrp.CanCollide = false
-            end
-        end
-    elseif hitboxesExpanded then
-        hitboxesExpanded = false
-        for _, p in pairs(game.Players:GetPlayers()) do
-            if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                local hrp = p.Character.HumanoidRootPart
-                hrp.Size = Vector3.new(2, 2, 1)
-                hrp.Transparency = 1
-                hrp.CanCollide = true
             end
         end
     end

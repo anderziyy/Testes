@@ -608,23 +608,6 @@ for _, brName in ipairs(sellBrainrots) do
 end
 sellScroll.CanvasSize = UDim2.new(0, 0, 0, ySellSize)
 
-local isServerHopRare = createOption("Server Hop: Rare/Mythic Timer", false, "Main")
-
-local function jumpServer()
-    local sfUrl = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
-    local success, result = pcall(function()
-        return HttpService:JSONDecode(game:HttpGet(sfUrl))
-    end)
-    if success and result and result.data then
-        for _, server in ipairs(result.data) do
-            if server.playing < server.maxPlayers and server.id ~= game.JobId then
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, Player)
-                break
-            end
-        end
-    end
-end
-
 local isGodRagdoll = createOption("Anti Ragdoll", true, "Main")
 
 local buyIce = createOption("Auto Ice Emblem", false, "Buy")
@@ -1351,49 +1334,6 @@ task.spawn(function()
                         task.wait(0.1)
                     end
                 end
-            end
-        end
-    end
-end)
-
-task.spawn(function()
-    while task.wait(5) do
-        if isServerHopRare() then
-            local foundRare = false
-            local brainrotsPath = workspace:FindFirstChild("Client") and workspace.Client:FindFirstChild("Path") and workspace.Client.Path:FindFirstChild("Brainrots")
-            
-            if brainrotsPath then
-                for _, model in pairs(brainrotsPath:GetChildren()) do
-                    local ui = model:FindFirstChild("Brainrot_UI")
-                    local frame = ui and ui:FindFirstChild("Frame")
-                    local title = frame and frame:FindFirstChild("Title") and frame.Title.Text
-                    
-                    if title and (secretNames[title] or stellarNames[title]) then
-                        foundRare = true
-                        break
-                    end
-                end
-            end
-
-            local mythicTimerLabel = nil
-            pcall(function()
-                local timerGui = PlayerGui:FindFirstChild("Main") and PlayerGui.Main:FindFirstChild("MythicTimer")
-                if timerGui then mythicTimerLabel = timerGui end
-            end)
-
-            if not foundRare and mythicTimerLabel then
-                local timerText = mythicTimerLabel.Text
-                local minutes, seconds = timerText:match("(%d+):(%d+)")
-                if minutes and seconds then
-                    local totalSeconds = (tonumber(minutes) * 60) + tonumber(seconds)
-                    if totalSeconds <= 60 then
-                        foundRare = true
-                    end
-                end
-            end
-
-            if not foundRare then
-                jumpServer()
             end
         end
     end

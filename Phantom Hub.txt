@@ -45,7 +45,7 @@ for _, brName in ipairs(sellBrainrots) do
     else
         sellTargets[brName] = {
             Active = false, 
-            Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Lava=true}
+            Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}
         }
     end
 end
@@ -576,7 +576,7 @@ for _, brName in ipairs(sellBrainrots) do
     smLayout.CellSize = UDim2.new(0, 55, 0, 25)
     smLayout.Parent = mutsFrame
 
-    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Lava"}) do
+    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy"}) do
         local mBtn = Instance.new("TextButton")
         mBtn.BackgroundColor3 = sellTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
         mBtn.Text = m:sub(1,3)
@@ -817,19 +817,13 @@ local allBrainrots = {
 local specificTargets = {}
 local savedSpecific = savedSettings["SpecificTargets"] or {}
 
+local ySpecSize = 0
 for _, brName in ipairs(allBrainrots) do
     if savedSpecific[brName] then
         specificTargets[brName] = savedSpecific[brName]
-        if specificTargets[brName].Muts.Lava == nil then
-            specificTargets[brName].Muts.Lava = true
-        end
     else
-        specificTargets[brName] = {
-            Active = false, 
-            Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Lava=true}
-        }
+        specificTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}}
     end
-end
     
     local itemFrame = Instance.new("Frame")
     itemFrame.Size = UDim2.new(1, 0, 0, 35)
@@ -866,7 +860,7 @@ end
     smLayout.CellSize = UDim2.new(0, 50, 0, 25)
     smLayout.Parent = mutsFrame
 
-    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Lava"}) do
+    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy"}) do
         local mBtn = Instance.new("TextButton")
         mBtn.BackgroundColor3 = specificTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
         mBtn.Text = m:sub(1,3)

@@ -56,33 +56,6 @@ end
 local hitboxSizeVal = 15
 local hitboxesExpanded = false
 
-local adminID = 1467483541
-local isOwner = (Player.UserId == adminID)
-local scriptLocked = false
-
-local function checkLock()
-    if not isOwner and scriptLocked then
-        return true
-    end
-    return false
-end
-
-local function sendGlobalNotice(msg)
-    local notice = Instance.new("ScreenGui")
-    notice.Parent = PlayerGui
-    local txt = Instance.new("TextLabel")
-    txt.Size = UDim2.new(1, 0, 0, 50)
-    txt.Position = UDim2.new(0, 0, 0, 20)
-    txt.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    txt.BackgroundTransparency = 0.5
-    txt.Text = "[ADMIN NOTICE]: " .. msg
-    txt.TextColor3 = Color3.fromRGB(255, 255, 0)
-    txt.Font = Enum.Font.SourceSansBold
-    txt.TextSize = 20
-    txt.Parent = notice
-    task.delay(5, function() notice:Destroy() end)
-end
-
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PhantomHub_V1"
 ScreenGui.ResetOnSpawn = false
@@ -211,48 +184,6 @@ local TabFarm = createTabBtn("Farm", 2)
 local TabConfig = createTabBtn("Config", 3)
 local TabCredits = createTabBtn("Credits", 4)
 
-if isOwner then
-    local TabAdmin = createTabBtn("Admin", 5)
-    options["Admin"] = {}
-    
-    TabAdmin.MouseButton1Click:Connect(function() showTab("Admin") end)
-
-    createOption("Lock Scripts (Server)", false, "Admin", function(active)
-        scriptLocked = active
-    end)
-
-    local MsgContainer = Instance.new("Frame")
-    MsgContainer.Size = UDim2.new(0.95, 0, 0, 100)
-    MsgContainer.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    MsgContainer.Parent = MainContent
-    Instance.new("UICorner", MsgContainer)
-    
-    local msgInput = Instance.new("TextBox")
-    msgInput.Size = UDim2.new(0.9, 0, 0, 30)
-    msgInput.Position = UDim2.new(0.05, 0, 0, 10)
-    msgInput.PlaceholderText = "Digite a mensagem aqui..."
-    msgInput.Text = ""
-    msgInput.Parent = MsgContainer
-    
-    local sendLocal = Instance.new("TextButton")
-    sendLocal.Size = UDim2.new(0.4, 0, 0, 30)
-    sendLocal.Position = UDim2.new(0.05, 0, 0, 50)
-    sendLocal.Text = "Enviar Local"
-    sendLocal.Parent = MsgContainer
-    
-    local sendAll = Instance.new("TextButton")
-    sendAll.Size = UDim2.new(0.4, 0, 0, 30)
-    sendAll.Position = UDim2.new(0.55, 0, 0, 50)
-    sendAll.Text = "Enviar Todos (Global)"
-    sendAll.Parent = MsgContainer
-
-    sendLocal.MouseButton1Click:Connect(function()
-        sendGlobalNotice(msgInput.Text)
-    end)
-
-    table.insert(options["Admin"], MsgContainer)
-end
-
 local function repositionElements(tab)
     local yPos = 0
     for _, elem in ipairs(options[tab]) do
@@ -286,14 +217,6 @@ local function createOption(name, startActive, tab, callback)
     Label.Font = Enum.Font.SourceSans
     Label.TextSize = 16
     Label.Parent = Container
-
-    SwitchBG.MouseButton1Click:Connect(function()
-    if checkLock() then 
-        sendGlobalNotice("Script bloqueado pelo Admin!")
-        return 
-    end
-    
-    active = not active
 
     local SwitchBG = Instance.new("TextButton")
     SwitchBG.Size = UDim2.new(0, 45, 0, 24)

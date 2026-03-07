@@ -480,7 +480,7 @@ local isSafeLuckyBlock = createOption("Safe Lucky Block AFK", false, "Main", fun
 
     if active then
         local num = tonumber(string.match(myBaseName, "%d+")) or 1
-        local offsetZ = (num <= 4) and 800 or -800
+        local offsetZ = (num <= 4) and 2000 or -2000
         
         local targetCFrame = telePart.CFrame * CFrame.new(0, 0, offsetZ)
         root.CFrame = targetCFrame

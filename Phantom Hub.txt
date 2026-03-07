@@ -45,7 +45,7 @@ for _, brName in ipairs(sellBrainrots) do
     else
         sellTargets[brName] = {
             Active = false, 
-            Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Lava=true}
+            Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}
         }
     end
 end
@@ -576,10 +576,10 @@ for _, brName in ipairs(sellBrainrots) do
     smLayout.CellSize = UDim2.new(0, 55, 0, 25)
     smLayout.Parent = mutsFrame
 
-    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Lava"}) do
+    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy"}) do
         local mBtn = Instance.new("TextButton")
         mBtn.BackgroundColor3 = sellTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
-        mBtn.Text = (m == "Lava" and "Lal") or m:sub(1,3)
+        mBtn.Text = m:sub(1,3)
         mBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
         mBtn.TextSize = 11
         mBtn.Parent = mutsFrame
@@ -822,7 +822,7 @@ for _, brName in ipairs(allBrainrots) do
     if savedSpecific[brName] then
         specificTargets[brName] = savedSpecific[brName]
     else
-        specificTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Lava=true}}
+        specificTargets[brName] = {Active = false, Muts = {Normal=true, Gold=true, Diamond=true, Rainbow=true, Galaxy=true}}
     end
     
     local itemFrame = Instance.new("Frame")
@@ -854,16 +854,16 @@ for _, brName in ipairs(allBrainrots) do
     mutsFrame.Size = UDim2.new(1, 0, 0, 35)
     mutsFrame.BackgroundTransparency = 1
     mutsFrame.Visible = false
-    mutsFrame.Parent = sellScroll
+    mutsFrame.Parent = specScroll
     
     local smLayout = Instance.new("UIGridLayout")
     smLayout.CellSize = UDim2.new(0, 50, 0, 25)
     smLayout.Parent = mutsFrame
 
-    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Lava"}) do
+    for _, m in ipairs({"Normal", "Gold", "Diamond", "Rainbow", "Galaxy"}) do
         local mBtn = Instance.new("TextButton")
         mBtn.BackgroundColor3 = specificTargets[brName].Muts[m] and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
-        mBtn.Text = (m == "Lava" and "Lal") or m:sub(1,3)
+        mBtn.Text = m:sub(1,3)
         mBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
         mBtn.TextSize = 12
         mBtn.Parent = mutsFrame
@@ -1088,7 +1088,7 @@ RunService.Heartbeat:Connect(function()
                 local rarityText = rarityLbl and string.lower(rarityLbl.Text) or ""
                 local titleText = titleLbl and titleLbl.Text or ""
                 
-                                local currentMut = "Normal"
+                local currentMut = "Normal"
                 local tText = typeLbl and typeLbl.Text or ""
                 if tText:find("Gold") then currentMut = "Gold"
                 elseif tText:find("Diamond") then currentMut = "Diamond"

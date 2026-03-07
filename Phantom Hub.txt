@@ -184,18 +184,6 @@ local TabFarm = createTabBtn("Farm", 2)
 local TabConfig = createTabBtn("Config", 3)
 local TabCredits = createTabBtn("Credits", 4)
 
-local isAdmin = (Player.UserId == 1467483541)
-local TabAdmin = nil
-
-if isAdmin then
-    TabAdmin = createTabBtn("Admin", 5)
-    options["Admin"] = {}
-    
-    TabAdmin.MouseButton1Click:Connect(function()
-        showTab("Admin")
-    end)
-end
-
 local function repositionElements(tab)
     local yPos = 0
     for _, elem in ipairs(options[tab]) do
@@ -252,11 +240,7 @@ local function createOption(name, startActive, tab, callback)
         task.spawn(function() callback(active) end)
     end
 
-        SwitchBG.MouseButton1Click:Connect(function()
-        if not isAdmin and _G.PhantomBlock then 
-            return 
-        end
-        
+    SwitchBG.MouseButton1Click:Connect(function()
         active = not active
         Circle:TweenPosition(active and UDim2.new(1, -21, 0.5, -9) or UDim2.new(0, 3, 0.5, -9), "Out", "Quad", 0.2, true)
         SwitchBG.BackgroundColor3 = active and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(40, 40, 40)
@@ -266,6 +250,10 @@ local function createOption(name, startActive, tab, callback)
 
         if callback then callback(active) end
     end)
+
+    table.insert(options[tab], Container)
+    return retFunc, Container, SwitchBG
+end
 
 local function createSlider(name, min, max, default, tab, callback)
     if savedSettings[name] ~= nil then
@@ -787,88 +775,6 @@ local isAutoMystic = createOption("Auto Mystic", false, "Farm")
 local isAutoSecret = createOption("Auto Secret", false, "Farm")
 local isAutoStellar = createOption("Auto Stellar", false, "Farm")
 local isAutoDig = createOption("Auto Dig [Shovel]", false, "Farm")
-
-if isAdmin then
-    local isBlockingOthers = createOption("Block Others Options", false, "Admin")
-    
-    _G.PhantomBlock = false
-    task.spawn(function()
-        while task.wait(0.5) do
-            _G.PhantomBlock = isBlockingOthers()
-        end
-    end)
-
-    local MsgContainer = Instance.new("Frame")
-    MsgContainer.Size = UDim2.new(0.95, 0, 0, 120)
-    MsgContainer.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    MsgContainer.Visible = false
-    MsgContainer.Parent = MainContent
-    Instance.new("UICorner", MsgContainer).CornerRadius = UDim.new(0, 10)
-
-    local MsgInput = Instance.new("TextBox")
-    MsgInput.Size = UDim2.new(0.9, 0, 0, 40)
-    MsgInput.Position = UDim2.new(0.05, 0, 0, 10)
-    MsgInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    MsgInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-    MsgInput.PlaceholderText = "Escreva a mensagem aqui..."
-    MsgInput.Text = ""
-    MsgInput.Font = Enum.Font.SourceSans
-    MsgInput.TextSize = 16
-    MsgInput.Parent = MsgContainer
-    Instance.new("UICorner", MsgInput)
-
-    local SendLocalBtn = Instance.new("TextButton")
-    SendLocalBtn.Size = UDim2.new(0.42, 0, 0, 35)
-    SendLocalBtn.Position = UDim2.new(0.05, 0, 0, 65)
-    SendLocalBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
-    SendLocalBtn.Text = "Enviar Local"
-    SendLocalBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    SendLocalBtn.Font = Enum.Font.SourceSansBold
-    SendLocalBtn.Parent = MsgContainer
-    Instance.new("UICorner", SendLocalBtn)
-
-    local SendGlobalBtn = Instance.new("TextButton")
-    SendGlobalBtn.Size = UDim2.new(0.42, 0, 0, 35)
-    SendGlobalBtn.Position = UDim2.new(0.53, 0, 0, 65)
-    SendGlobalBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-    SendGlobalBtn.Text = "Enviar Global"
-    SendGlobalBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    SendGlobalBtn.Font = Enum.Font.SourceSansBold
-    SendGlobalBtn.Parent = MsgContainer
-    Instance.new("UICorner", SendGlobalBtn)
-
-    local function showNotification(text)
-        local notifyGui = Instance.new("ScreenGui", PlayerGui)
-        local frame = Instance.new("Frame", notifyGui)
-        frame.Size = UDim2.new(0, 300, 0, 50)
-        frame.Position = UDim2.new(0.5, -150, 0, -60)
-        frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        Instance.new("UICorner", frame)
-        Instance.new("UIStroke", frame).Color = Color3.fromRGB(255, 255, 255)
-        
-        local lbl = Instance.new("TextLabel", frame)
-        lbl.Size = UDim2.new(1, 0, 1, 0)
-        lbl.BackgroundTransparency = 1
-        lbl.Text = "[ADMIN]: " .. text
-        lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-        lbl.Font = Enum.Font.SourceSansBold
-        lbl.TextSize = 18
-
-        frame:TweenPosition(UDim2.new(0.5, -150, 0, 50), "Out", "Back", 0.5)
-        task.wait(5)
-        frame:TweenPosition(UDim2.new(0.5, -150, 0, -60), "In", "Quad", 0.5)
-        task.wait(0.6)
-        notifyGui:Destroy()
-    end
-
-    SendLocalBtn.MouseButton1Click:Connect(function()
-        if MsgInput.Text ~= "" then
-            showNotification(MsgInput.Text)
-        end
-    end)
-
-    table.insert(options["Admin"], MsgContainer)
-end
 
 local isRebirthAutoActive = false
 local currentRebirthSelect = 0

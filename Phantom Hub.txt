@@ -443,49 +443,63 @@ local isLowMode = createOption("Low Mode", false, "Main", function(active)
     end
 end)
 
-local lbGyro, lbVelocity
-local isLuckyBlockFarm = createOption("Lucky Block Farm [Teleport]", false, "Main", function(active)
+local safeLBGb = nil
+local safeLBVb = nil
+
+local isSafeLuckyBlock = createOption("Safe Lucky Block AFK", false, "Main", function(active)
     local char = Player.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
-    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if not char then return end
     
-    local function getMyBase()
-        local serverBases = workspace:WaitForChild("Server", 5):WaitForChild("Bases", 5)
-        for _, base in pairs(serverBases:GetChildren()) do
-            local owner = base:FindFirstChild("OwnerId")
-            if owner and tonumber(owner.Value) == Player.UserId then
-                return base
+    local root = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not root or not hum then return end
+
+    local myBaseName = nil
+    local telePart = nil
+    
+    local serverBases = workspace:FindFirstChild("Server") and workspace.Server:FindFirstChild("Bases")
+    if serverBases then
+        for _, baseModel in pairs(serverBases:GetChildren()) do
+            local owner = baseModel:FindFirstChild("OwnerId")
+            if owner and tostring(owner.Value) == tostring(Player.UserId) then
+                myBaseName = baseModel.Name
+                telePart = baseModel:FindFirstChild("Teleport")
+                break
             end
         end
-        return nil
     end
 
-    local myBase = getMyBase()
-    if not myBase or not root or not hum then return end
-    local tpPart = myBase:FindFirstChild("Teleport")
-    if not tpPart then return end
+    if not myBaseName or not telePart then return end
 
     if active then
-        local targetPos = tpPart.CFrame * CFrame.new(0, 0, 300)
-        root.CFrame = targetPos
+        local num = tonumber(string.match(myBaseName, "%d+")) or 1
+        local offsetZ = (num <= 4) and 300 or -300
         
-        lbGyro = Instance.new("BodyGyro")
-        lbGyro.P = 9e4
-        lbGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-        lbGyro.cframe = targetPos
-        lbGyro.Parent = root
-        
-        lbVelocity = Instance.new("BodyVelocity")
-        lbVelocity.velocity = Vector3.new(0, 0, 0)
-        lbVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
-        lbVelocity.Parent = root
+        local targetCFrame = telePart.CFrame * CFrame.new(0, 0, offsetZ)
+        root.CFrame = targetCFrame
+
+        if not safeLBGb then
+            safeLBGb = Instance.new("BodyGyro")
+            safeLBGb.P = 9e4
+            safeLBGb.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+            safeLBGb.cframe = targetCFrame
+            safeLBGb.Parent = root
+        end
+
+        if not safeLBVb then
+            safeLBVb = Instance.new("BodyVelocity")
+            safeLBVb.velocity = Vector3.new(0, 0, 0)
+            safeLBVb.maxForce = Vector3.new(9e9, 9e9, 9e9)
+            safeLBVb.Parent = root
+        end
         
         hum.PlatformStand = true
     else
-        if lbGyro then lbGyro:Destroy() end
-        if lbVelocity then lbVelocity:Destroy() end
+        if safeLBGb then safeLBGb:Destroy() safeLBGb = nil end
+        if safeLBVb then safeLBVb:Destroy() safeLBVb = nil end
         hum.PlatformStand = false
-        root.CFrame = tpPart.CFrame
+        
+        root.CFrame = telePart.CFrame
     end
 end)
 
